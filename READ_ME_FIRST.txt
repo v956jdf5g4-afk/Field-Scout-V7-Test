@@ -1,19 +1,26 @@
-Field Scout v7.1 — Beta Preview
+Field Scout v7.2 — Reliability Candidate (TEST BUILD)
 
-This build is a consolidated preview based on the v7.0.5 GitHub ZIP.
+Built from the exact v7.1.1 Recipes Fix ZIP provided by the user.
 
-Included:
-- Planning Back button label follows the previously visited main tab.
-- Fields / Notes opens with field list hidden and remembers the last field for this browser session.
-- Recipe/Spray Order sections can be expanded/collapsed.
-- Settings: export ALL local scouting notes to Excel-compatible CSV (all years, including deleted records flagged).
-- Settings: download a full-device JSON copy of local notes and settings (including plans, annual field data, and spray data).
-- Test Center includes additional checks.
+Deploy: Extract this ZIP, then upload its contents (index.html, sw.js, manifest.webmanifest) to the V7 TEST GitHub repository. Do not touch the old v6.3 app.
 
-NOT INCLUDED / NOT VERIFIED:
-- Automatic syncing of plans, annual field info, recipes, and spray orders. Only scouting notes sync as in v7.0.5.
-- Automatic daily cloud backups or cloud restore.
-- Full-device JSON restore workflow. Do NOT use the older scouting-only Restore button for the new full-device JSON.
-- End-to-end browser and real-device tests. JavaScript syntax was checked; browser execution was blocked in the build environment.
+WHAT CHANGED
+- Cloud sync now includes individual app settings, including plans, annual field data, spray recipes, products, assignments, and spray orders, using the existing Supabase revision-checked save function.
+- Divergent setting data is preserved for review rather than silently overwritten. Resolve conflicts in Settings, after downloading a full-device backup.
+- A daily cloud snapshot of notes and application settings is written to the existing Supabase sync table after a conflict-free sync. This snapshot is NOT independent of Supabase and has no one-click restore yet.
+- Existing daily local snapshots, full-device JSON export, and scouting CSV export remain available.
 
-This is a TEST build, not approved for real scouting. Keep v7.0.5 archived and do not delete browser storage.
+IMPORTANT LIMITATIONS
+- This is not a field-ready release yet. No end-to-end browser, PC/iPad cross-device, or restore test was performed in this build environment.
+- Cloud snapshots are in the SAME Supabase project as live synced records, not a separate cloud backup. Download the full-device JSON regularly and store it outside Supabase.
+- The local daily recovery snapshot mechanism does not yet have a tested full-device restore procedure.
+- Existing Test Center checks are local diagnostics, not proof of successful cloud recovery.
+- After syncing new plan/recipe data from another device, reload the page to refresh the screen.
+
+MINIMUM ACCEPTANCE TEST
+1. On PC, save a TEST plan and a TEST recipe; click Sync in Settings.
+2. On iPad, sign in, sync, reload, and verify both appear.
+3. On iPad, go offline, change a test recipe or plan, reconnect, sync, then verify PC receives it.
+4. Export a full-device backup and verify it appears in Downloads.
+5. Confirm Settings sync status reports a daily cloud snapshot; no conflict warnings.
+Do not use for sole-copy production records until recovery is tested.

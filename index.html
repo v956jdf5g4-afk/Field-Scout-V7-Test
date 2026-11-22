@@ -11,7 +11,7 @@ nav{display:flex;gap:10px;margin:0 0 18px;flex-wrap:wrap}nav button{background:#
 
 .field-header-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}.field-recipe-anchor{position:relative}.field-recipe-trigger{white-space:nowrap;border:1px solid #bdd3c4;background:#e9f2eb;color:#173f2d;font-weight:700}.field-recipe-trigger.has-recipe{background:#dff0e5;border-color:#8cb69a}.field-recipe-popover{position:absolute;right:0;top:calc(100% + 9px);z-index:40;width:min(350px,calc(100vw - 40px));box-sizing:border-box;background:white;border:1px solid #b7d6c2;box-shadow:0 10px 30px #1a382a29;border-radius:12px;padding:15px;text-align:left}.field-recipe-popover label{font-weight:700;display:block;margin-bottom:8px}.field-recipe-popover select{width:100%;max-width:100%;margin-bottom:8px}.field-recipe-popover p{margin:5px 0 10px}.field-recipe-popover.hide{display:none!important}@media(max-width:540px){.field-header-actions{gap:6px}.field-recipe-trigger{font-size:12px;padding:8px}.field-recipe-popover{right:-45px}}
 
-/* v7.0.5 layout cleanup */
+/* v7.2 layout cleanup */
 .header-actions{display:flex;align-items:center;gap:9px}.header-actions #v705Gear{font-size:24px;padding:5px 12px;background:#e9f1e9;color:#19452d}.sync-dot{color:#a87b1d;font-size:17px}.v705-subnav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.v705-subnav button{background:#e6eee7;color:#244b34}.v705-subnav button.selected{background:#246a43;color:white}#v705Maintenance{max-width:1050px;margin:14px auto;padding:0 12px}#v705Maintenance:not(.hide){display:block}#v705SettingsHeading{max-width:1000px;margin:12px auto}.v705-settings-tools{max-width:1000px;margin:12px auto;padding:14px;background:#fff;border:1px solid #dce5dc;border-radius:12px}#v705Back{white-space:nowrap}.collapse-summary{font-size:19px}.v705-settings-tools .notice{display:block!important}#v705SettingsHeading button{float:right}@media(max-width:650px){.header-actions #saveStatus{display:none}.v705-subnav button{flex:1;padding:10px 7px;font-size:13px}.scout-toolbar{flex-wrap:wrap}}
 </style><style>.spray-section h2[role=button]{cursor:pointer;padding:12px 34px 12px 0;position:relative}.spray-section h2[role=button]:after{content:"▾";position:absolute;right:8px}.spray-section h2[aria-expanded=false]:after{content:"▸"}.v71-spray-body[hidden]{display:none!important}</style></head><body><header><div><strong>🌱 Field Scout</strong><div><small>Version 7.1 · Beta Preview</small></div></div><div class="header-actions"><span id="v705SyncDot" class="sync-dot" title="Sync details in Settings">●</span><button id="v705Gear" type="button" aria-label="Open Settings" aria-expanded="false">⚙</button><small id="saveStatus">Starting…</small></div></header><main><div class="notice hide" style="padding:10px"><b>v7 test app:</b> Scouting notes sync when signed in. Plans, annual field changes and spray data are local to this device. Keep using v6.3 for real work.</div><details id="v7BackupTools" style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:650">Backup & restore tools</summary><div class="backupbar" style="margin-top:10px"><button id="backupAll" type="button">⬇ Back up all data</button><label class="importButton" for="restoreFile">⬆ Restore backup</label><label class="importButton" for="importFile">⇄ Import scouting notes</label><input type="file" id="importFile" accept=".json,application/json" hidden><input type="file" id="restoreFile" accept=".json,application/json" hidden><span id="backupStatus" class="muted" role="status"></span><span id="lastBackup" class="muted"></span></div></details><div class="yearbar"><label for="cropYear">Crop year</label><select id="cropYear"><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select><button class="mini" id="editAnnual" type="button">Edit selected field crop / acres</button><span id="annualStatus" class="muted"></span></div><nav><button id="homeTab" class="selected" type="button">🏠 Scouting Plan</button><button id="planningTab" type="button">📋 Planning</button><button id="scoutTab" type="button">🌾 Fields / Notes</button><button id="sprayTab" type="button">🧪 Recipes & Spray Orders</button></nav>
 <section id="homeView"><div class="v705-subnav" role="group" aria-label="Scouting Plan views"><button type="button" class="selected" data-v705-view="today">Today’s Plan</button><button type="button" data-v705-view="due">Due / Overdue</button><button type="button" data-v705-view="upcoming">Upcoming</button></div><div id="v705Today"><div class="dashboard-grid"><div class="metric"><b id="countPlanned">0</b><small>Remaining today</small></div><button class="metric jump" id="jumpCompleted" type="button" aria-label="Jump to completed today"><b id="countCompleted">0</b><small>Completed today ↓</small></button><div class="metric"><b id="countDue">0</b><small>Due / overdue</small></div></div><div><section class="panel"><div class="section-heading"><h2>Today's Scouting Plan</h2><span id="planDate" class="pill"></span></div><p class="muted">Your selected fields, grouped by farmer and crop. Saving a scouting note moves a field to Completed.</p><div id="plannedFields"></div><details id="v705Completed" class="collapse-panel" style="margin-top:22px"><summary id="completedSection" class="collapse-summary">Completed Today</summary><div id="completedFields"></div></details></section></div></div><section id="v705Due" class="panel hide" style="margin-top:16px"><h2>Due / Overdue</h2><p class="muted">Based on the most recent scouting note for each field. Add any of these to your plan.</p><div id="dueFields"></div></section><section id="v705Upcoming" class="panel hide" style="margin-top:16px"><h2>Upcoming Visits — Next 7 Days</h2><div id="upcomingFields"></div></section></section>
@@ -272,6 +272,102 @@ async function report(message){
  await renderReviews();
 }
 function schedule(){clearTimeout(debounce);debounce=setTimeout(()=>runSync(),1500)}
+
+// v7.2: Synchronize each app setting with an optimistic-revision RPC.
+// Never replace divergent values without an explicit decision.
+const fs72Prefix='fs72:';
+const fs72Base=k=>fs72Prefix+'base:'+k;
+const fs72Conflict=k=>fs72Prefix+'conflict:'+k;
+const fs72Skip=k=>k.startsWith('v7-')||k.startsWith('fs72:')||k.startsWith('v705-')||k.startsWith('fs-last-');
+const fs72Eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+async function fs72Save(category,key,value,rev){
+ const {data,error}=await client.rpc('field_scout_save',{p_category:category,p_record_key:key,p_data:value,p_expected_revision:rev});
+ if(error)throw error;
+ return data;
+}
+async function syncExtraSettings(){
+ const {data:cloud,error}=await client.from('field_scout_sync').select('record_key,data,revision').eq('category','setting').range(0,9999);
+ if(error)throw error;
+ const remote=new Map((cloud||[]).filter(x=>!x.record_key.startsWith('backup-')).map(x=>[x.record_key,x]));
+ const local=new Map((await getAll('settings')).filter(x=>!fs72Skip(x.key)).map(x=>[x.key,x.value]));
+ let uploaded=0,downloaded=0,conflicts=0;
+ for(const [key,r] of remote){
+  const base=await setting(fs72Base(key));const hasLocal=local.has(key);const value=local.get(key);
+  if(!hasLocal){
+   if(base!==undefined){await put(fs72Conflict(key),{key,reason:'Local setting missing',local:null,remote:r.data});conflicts++;continue}
+   await put(key,r.data);await put(fs72Base(key),{data:r.data,revision:r.revision});downloaded++;continue;
+  }
+  if(fs72Eq(value,r.data)){
+   await put(fs72Base(key),{data:r.data,revision:r.revision});await del(fs72Conflict(key));continue;
+  }
+  if(base&&fs72Eq(value,base.data)){
+   await put(key,r.data);await put(fs72Base(key),{data:r.data,revision:r.revision});await del(fs72Conflict(key));downloaded++;continue;
+  }
+  if(base&&fs72Eq(r.data,base.data))continue;
+  await put(fs72Conflict(key),{key,reason:'Both devices have different data',local:value,remote:r.data});conflicts++;
+ }
+ for(const [key,value] of local){
+  const r=remote.get(key);if(r&&fs72Eq(r.data,value))continue;
+  if(r){const base=await setting(fs72Base(key));if(!base||!fs72Eq(base.data,r.data))continue}
+  try{
+   const revision=await fs72Save('setting',key,value,r?r.revision:0);
+   await put(fs72Base(key),{data:value,revision});await del(fs72Conflict(key));uploaded++;
+  }catch(e){
+   if(/conflict|duplicate|revision/i.test(e.message||'')){
+    await put(fs72Conflict(key),{key,reason:'Cloud changed during upload',local:value,remote:r?.data??null});conflicts++;
+   }else throw e;
+  }
+ }
+ let backup=false;
+ if(conflicts===0 && (await conflicts()).length===0){
+  const day=new Date().toLocaleDateString('en-CA');
+  const key='backup-'+day;
+  const {data:existing,error:backupError}=await client.from('field_scout_sync').select('record_key').eq('category','setting').eq('record_key',key).maybeSingle();
+  if(backupError)throw backupError;
+  if(existing){backup=true}
+  else{
+   const payload={format:'FieldScoutV72CloudSnapshot',version:1,createdAt:new Date().toISOString(),notes:await getAll('notes'),settings:(await getAll('settings')).filter(x=>!fs72Skip(x.key)),warning:'Cloud snapshot is stored in the same Supabase project, not an independent offsite backup.'};
+   try{await fs72Save('setting',key,payload,0);backup=true}catch(e){if(!/conflict|duplicate|revision/i.test(e.message||''))throw e;backup=true}
+  }
+ }
+ await fs72RenderConflicts();
+ return {uploaded,downloaded,conflicts,backup};
+}
+async function fs72RenderConflicts(){
+ const box=document.getElementById('fs72Conflicts');if(!box)return;
+ const items=(await getAll('settings')).filter(x=>x.key.startsWith(fs72Prefix+'conflict:')).map(x=>x.value);
+ box.replaceChildren();
+ if(!items.length){box.textContent='No additional data conflicts.';return}
+ const heading=document.createElement('p');heading.textContent=items.length+' plan/recipe/field-data conflict(s). Review before switching devices.';box.append(heading);
+ for(const item of items){
+  const wrap=document.createElement('details'),summary=document.createElement('summary');summary.textContent=item.key+' — '+item.reason;wrap.append(summary);
+  for(const [label,data] of [['This device',item.local],['Cloud',item.remote]]){
+   const h=document.createElement('strong');h.textContent=label;wrap.append(h);
+   const pre=document.createElement('pre');pre.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;max-height:180px;overflow:auto';pre.textContent=JSON.stringify(data,null,2);wrap.append(pre);
+  }
+  const help=document.createElement('p');help.textContent='Conflict preserved. Download a full-device backup before choosing a version. Automatic merging is disabled.';wrap.append(help);
+  for(const choice of ['Keep this device','Use cloud']){
+   const b=document.createElement('button');b.type='button';b.textContent=choice;
+   b.onclick=async()=>{
+    if(!confirm('Replace the other version of '+item.key+' with '+choice+'? Make a full-device backup first.'))return;
+    try{
+     const {data:row,error}=await client.from('field_scout_sync').select('data,revision').eq('category','setting').eq('record_key',item.key).maybeSingle();if(error)throw error;
+     const selected=choice==='Use cloud'?row?.data:item.local;
+     if(selected===undefined||selected===null)throw Error('Missing selected version');
+     if(choice==='Keep this device'){
+      const revision=await fs72Save('setting',item.key,selected,row?.revision||0);
+      await put(fs72Base(item.key),{data:selected,revision});
+     }else await put(fs72Base(item.key),{data:selected,revision:row.revision});
+     await put(item.key,selected);await del(fs72Conflict(item.key));
+     await fs72RenderConflicts();
+     alert('Resolved. Reload the app to refresh the affected screen.');
+    }catch(e){alert('Could not resolve: '+e.message)}
+   };wrap.append(b);
+  }
+  box.append(wrap);
+ }
+}
+
 async function runSync(){
  if(busy){pending=true;return}
  if(resolving||!ready||!client)return;
@@ -339,7 +435,9 @@ async function runSync(){
   }
   records=(await getAll('notes')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
   renderDashboard();if(current)renderHistory();
-  await report('Cloud check finished. '+uploaded+' uploaded, '+downloaded+' downloaded. Only scouting notes sync.');
+  const extras=await syncExtraSettings();
+  await report('Cloud check finished. Notes: '+uploaded+' uploaded, '+downloaded+' downloaded. Other data: '+extras.uploaded+' uploaded, '+extras.downloaded+' downloaded; '+extras.conflicts+' items need review. '+(extras.backup?'Daily cloud snapshot verified.':'Cloud snapshot not verified.'));
+
  }catch(e){await report('Sync incomplete — local notes kept. '+(e.message||e))}
  finally{busy=false;if(pending){pending=false;setTimeout(runSync,500)}}
 }
@@ -413,7 +511,7 @@ try{
 })();
 </script>
 <script>
-/* v7.0.5 UI navigation — existing data and cloud logic unchanged */
+/* v7.2 UI navigation — existing data and cloud logic unchanged */
 (()=>{
  const $v=id=>document.getElementById(id);
  const maintenance=$v('v705Maintenance');
@@ -459,12 +557,13 @@ try{
  const dot=$v('v705SyncDot'),status=$v('v7SyncStatus');if(status){const update=()=>{const msg=status.textContent.toLowerCase();dot.style.color=msg.includes('conflict')||msg.includes('error')?'#b34b25':msg.includes('up to date')?'#246a43':'#a87b1d';dot.title=status.textContent+' — details in Settings';};new MutationObserver(update).observe(status,{childList:true,subtree:true,characterData:true});update();}
 })();
 </script><script>
-/* v7.1 export, local recovery and spray-order workspace. No schema changes. */
+/* v7.2 reliability build: exports and workspace. No database schema changes. */
 (()=>{
  const $=id=>document.getElementById(id);
  const panel=document.createElement('section');panel.className='v705-settings-tools';
  panel.innerHTML='<h3>Data export & full-device backup</h3><p class="muted">These exports are read-only. Downloaded backups are separate from cloud sync. Check Downloads after exporting.</p><div class="actions"><button type="button" id="v71Excel">Export all scouting notes (Excel CSV)</button><button type="button" id="v71FullBackup">Download full-device backup (JSON)</button></div><p id="v71ExportStatus" role="status" class="muted"></p>';
  const area=$('v705Maintenance');area.insertBefore(panel,$('v7TestCenter'));
+ const conflictPanel=document.createElement('section');conflictPanel.innerHTML='<h3>Additional cloud sync conflicts</h3><div id="fs72Conflicts">Check sync status to load conflicts.</div><p class="muted">Cloud snapshots share the same Supabase database and are not independent disaster-recovery backups. Keep downloaded backups separately.</p>';area.insertBefore(conflictPanel,$('v7TestCenter'));
  const download=(contents,name,type)=>{const blob=new Blob([contents],{type});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000)};
  const csvCell=x=>'"'+String(x??'').replace(/"/g,'""')+'"';
  const stamp=()=>new Date().toISOString().slice(0,10);
