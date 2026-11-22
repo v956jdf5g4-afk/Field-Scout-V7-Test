@@ -27,7 +27,8 @@ nav{display:flex;gap:10px;margin:0 0 18px;flex-wrap:wrap}nav button{background:#
 <input id="v7Email" type="email" autocomplete="username" placeholder="Supabase login email" style="min-width:190px;padding:9px">
 <input id="v7Password" type="password" autocomplete="current-password" placeholder="Password" style="min-width:160px;padding:9px">
 <button id="v7Login" type="button">Sign in</button><button id="v7Sync" type="button">Sync now</button><button id="v7Logout" type="button">Sign out</button>
-</div><p id="v7SyncStatus" role="status" style="font-weight:600;margin:10px 0 0">Not signed in. Local-only test mode.</p>
+</div><p id="v7SyncStatus" role="status" style="font-weight:600;margin:10px 0 0">Not signed in. Local-only test mode.</p><div id="v7ConflictBox" hidden style="margin:10px 0;padding:10px;border:2px solid #b55b29;border-radius:8px;font-weight:bold"></div>
+<button id="v7ExportConflicts" type="button">Export conflict details</button>
 <p style="font-size:13px;margin:6px 0 0">Offline changes stay on this device. Sync status must say “Up to date” before switching devices. Conflicts are kept locally and require review.</p>
 </section><div id="visitModal" class="modal-overlay hide" role="dialog" aria-modal="true" aria-labelledby="visitTitle"><div class="modal-card"><div class="row"><h2 id="visitTitle">When should you scout this field again?</h2><button id="cancelVisit" type="button" aria-label="Cancel saving">✕</button></div><p class="muted">Choose your next visit. This will save and return you Home.</p><div class="visit-grid"><button data-visit="3">3 days</button><button data-visit="5">5 days</button><button data-visit="7">7 days</button><button data-visit="10">10 days</button><button data-visit="14">14 days</button><button data-visit="30">30 days</button><button data-visit="none">No follow-up</button></div><div class="custom-visit"><label for="customDays">Or enter a custom number of days</label><div class="row"><input id="customDays" type="number" min="1" max="365" value="21" inputmode="numeric"><button id="saveCustom" type="button">Save custom</button></div></div><button id="endYear" class="end-year" type="button">Recheck in 30 Days</button><p id="visitError" class="due" role="status"></p></div></div><div id="overlapModal" class="modal-overlay hide" role="dialog" aria-modal="true"><div class="modal-card"><h2>Combine nearby visits?</h2><p id="overlapText"></p><label for="overlapDate">Keep one visit on</label><select id="overlapDate"></select><div class="actions"><button id="combineVisits" class="primary">Combine visits</button><button id="keepVisits">Keep both</button><button id="cancelOverlap">Cancel</button></div></div></div><script>
 const fields=[["FC 6", "Rabenberg Q", 44, "Spring wheat", "JF"], ["FC 11", "Knittle Klein W", 180, "Soybeans", "JF"], ["FC 10", "Paulson N", 153, "Soybeans", "JF"], ["FW 8", "Lahren's Field", 128, "Spring wheat", "JF"], ["FW 1", "Lindeman N", 152, "Soybeans", "JF"], ["FW 15", "Peterson", 160, "Corn", "JF"], ["FW 16", "Hanson S", 132, "Soybeans", "JF"], ["FW 17", "McHanson N", 130, "Winter wheat", "JF"], ["FW 13", "Hanson N", 185, "Spring wheat", "JF"], ["FW 18", "McHanson S", 148, "Spring wheat", "JF"], ["FW 10", "Molstad", 173, "Soybeans", "JF"], ["FW 6", "Larson Milton N", 160, "Winter wheat", "JF"], ["FC 9", "Rabenberg Corners", 182, "Soybeans", "JF"], ["FW 9", "Patterson N", 158, "Spring wheat", "JF"], ["FW 14", "Shillingstad", 52, "Soybeans", "JF"], ["FW 11", "Nelson", 152, "Corn", "JF"], ["FC 5", "Bunny", 155, "Corn", "JF"], ["FW 2", "Paulson", 148, "Spring wheat", "JF"], ["FC 1", "Rabenberg NW", 158, "Corn", "JF"], ["FW 3", "Hohle", 73, "Soybeans", "JF"], ["FC 4", "Steiger", 134, "Soybeans", "JF"], ["FW 5", "Olson", 160, "Corn", "JF"], ["FC 3", "\"19\"", 145, "Soybeans", "JF"], ["FC 13", "Winchell", 155, "Soybeans", "JF"], ["FC 8", "Anderson", 155, "Soybeans", "JF"], ["FC 7", "Rabenberg U", 53, "Corn", "JF"], ["FW 4", "Lindeman 40", 40, "Corn", "JF"], ["FW 12", "Pattersn S", 150, "Corn", "JF"], ["FW 7", "Larson Milton S", 135, "Winter wheat", "JF"], ["FC 2", "Rabenberg NE", 156, "Spring wheat", "JF"], ["FC 12", "Knittle Klein E ", 126, "Corn", "JF"], ["TC 1", "C-Hart", 72, "Corn", "HT"], ["TC 2", "Gunderson", 157, "Soybeans", "HT"], ["TC 3", "Amundson", 158, "Corn", "HT"], ["TW 5", "Morton Building", 60, "Corn", "HT"], ["TC 5", "Doc's", 147, "Corn", "HT"], ["TC 6", "Helgie's", 147, "Soybeans", "HT"], ["TC 4", "Bins", 157, "Corn", "HT"], ["TC 7", "N County Line", 156, "Soybeans", "HT"], ["TW 1", "Schlomer's Old Place", 142, "Corn", "HT"], ["TW 8", "Rye's", 222, "Soybeans", "HT"], ["TW 3", "West of Stroeder", 147, "Soybeans", "HT"], ["TW 2", "Grainery", 155, "Soybeans", "HT"], ["TW 12", "Kirby's", 56, "Corn", "HT"], ["TW 4", "N Lahren Driveway", 78, "Soybeans", "HT"], ["TW 6", "SW Stroeder", 92, "Soybeans", "HT"], ["TW 7", "W of Frey's", 156, "Soybeans", "HT"], ["TW 9", "Turner", 77, "Soybeans", "HT"], ["TW 10", "Tower Hill N", 155, "Corn", "HT"], ["TW 11", "Tower Hill S", 124, "Corn", "HT"], ["PC 5", "Horn 1/2", 285, "Corn", "JP"], ["PC 7", "Glenham", 365, "Soybeans", "JP"], ["PC 6", "McArthur", 157, "Corn", "JP"], ["PC 3", "Duper", 141, "Corn", "JP"], ["PC 4", "MyronHIll", 68, "Soybeans", "JP"], ["PC 2", "Home 1/4", 133, "Corn", "JP"], ["PC 1", "Prasek 1/2", 275, "Soybeans", "JP"], ["RW 14", "Glenham", 147, "Spring wheat", "JR"], ["RW 15", "Cemetary", 140, "Spring wheat", "JR"], ["RW 13", "Molstad", 140, "Soybeans", "JR"], ["RW 8", "Quashnick", 140, "Soybeans", "JR"], ["RW 9", "Rabenberg N", 104, "Soybeans", "JR"], ["RW 10", "Rabenberg E", 121, "Soybeans", "JR"], ["RW 12", "Rabenberg S", 49, "Soybeans", "JR"], ["RW 1", "Carters", 154, "Spring wheat", "JR"], ["RW 3", "Waterman E", 147, "Soybeans", "JR"], ["RW 6", "Droog 1/4", 126, "Spring wheat", "JR"], ["RW 17", "Reinbold E", 182, "Soybeans", "JR"], ["RW 18", "Reinbold W", 88, "Spring wheat", "JR"], ["RW 16", "S of Mike's", 70, "Spring wheat", "JR"], ["RW 2", "Home 60", 65, "Corn", "JR"], ["RW 7", "Ralph W", 50, "Corn", "JR"], ["RW 4", "Ralph E", 70, "Corn", "JR"], ["RW 11", "Jim's 1/4", 145, "Corn", "JR"]];
@@ -183,234 +184,137 @@ S('sprayProductUnit').innerHTML=opt(packs,'gal');S('sprayProductRateUnit').inner
 })();
 
 </script>
+
+
 <script type="module">
-const SUPABASE_URL='https://avhffntmlrushevnqufx.supabase.co';
-const SUPABASE_KEY='sb_publishable_VvijwxXqJPuCeBCAZRlFCA_C0aN26_c';
-const $v=id=>document.getElementById(id);
-const status=(s)=>{$v('v7SyncStatus').textContent=s};
-let client=null, busy=false, timer=null;
-const shadowKey=id=>'v7-cloud-revision:'+id;
+const URL='https://avhffntmlrushevnqufx.supabase.co';
+const KEY='sb_publishable_VvijwxXqJPuCeBCAZRlFCA_C0aN26_c';
+const el=id=>document.getElementById(id);
+let client=null,busy=false,pending=false,debounce;
 const snapshotKey=id=>'v7-cloud-snapshot:'+id;
+const revisionKey=id=>'v7-cloud-revision:'+id;
 const conflictKey=id=>'v7-conflict:'+id;
-async function localSetting(k){return await getSetting(k)}
-async function putSetting(k,v){await transaction(['settings'],'readwrite',tx=>tx.objectStore('settings').put({key:k,value:v}))}
 const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
-async function session(){return (await client.auth.getSession()).data.session}
+const status=s=>el('v7SyncStatus').textContent=s;
+async function setting(k){return getSetting(k)}
+async function put(k,v){await transaction(['settings'],'readwrite',tx=>tx.objectStore('settings').put({key:k,value:v}))}
+async function del(k){await transaction(['settings'],'readwrite',tx=>tx.objectStore('settings').delete(k))}
+async function allSettings(){return getAll('settings')}
+async function conflicts(){return (await allSettings()).filter(x=>x.key.startsWith('v7-conflict:')).map(x=>x.value)}
+async function report(message){
+ const c=await conflicts();
+ const box=el('v7ConflictBox');
+ if(c.length){
+  box.hidden=false;
+  box.textContent='⚠ '+c.length+' unresolved scouting note conflict(s). Local notes are preserved. Do not switch devices for these notes. Export a backup and ask for help reviewing the differences.';
+  status('Needs review — '+c.length+' unresolved conflict(s). '+message);
+ }else{box.hidden=true;status(message)}
+}
+function schedule(){clearTimeout(debounce);debounce=setTimeout(()=>runSync(),1500)}
 async function runSync(){
- if(busy||!ready||!client)return;
+ if(busy){pending=true;return}
+ if(!ready||!client)return;
  busy=true;
  try{
-  const s=await session();
-  if(!s){status('Not signed in — changes are local only.');return}
-  if(!navigator.onLine){status('Offline — scouting notes saved locally; sync pending.');return}
-  status('Syncing scouting notes…');
-  // Fetch all notes before uploading. This prevents a stale device from overwriting unseen cloud changes.
-  const {data:cloud,error:fetchError}=await client.from('field_scout_sync')
-   .select('record_key,data,revision').eq('category','scouting_note');
-  if(fetchError)throw fetchError;
+  const {data:{session},error:sessionError}=await client.auth.getSession();
+  if(sessionError)throw sessionError;
+  if(!session){await report('Not signed in — local changes have not been uploaded.');return}
+  if(!navigator.onLine){await report('Offline — notes saved locally; cloud not checked.');return}
+  await report('Checking cloud…');
+  const {data:cloud,error:readError}=await client.from('field_scout_sync').select('record_key,data,revision').eq('category','scouting_note');
+  if(readError)throw readError;
   const remote=new Map((cloud||[]).map(x=>[x.record_key,x]));
   const local=await getAll('notes');
-  const localMap=new Map(local.map(x=>[x.id,x]));
-  let uploaded=0,downloaded=0,conflicts=0;
+  const locals=new Map(local.map(x=>[x.id,x]));
+  let uploaded=0,downloaded=0;
   for(const [id,r] of remote){
-   const localNote=localMap.get(id);
-   const base=await localSetting(snapshotKey(id));
-   if(!localNote){
-    if(validRecord(r.data)){
-     await transaction(['notes'],'readwrite',tx=>tx.objectStore('notes').put(r.data));
-     await putSetting(shadowKey(id),r.revision);await putSetting(snapshotKey(id),r.data);
-     downloaded++;
-    }
-   }else if(equal(localNote,r.data)){
-    await putSetting(shadowKey(id),r.revision);await putSetting(snapshotKey(id),r.data);
-   }else if(base!==undefined && equal(localNote,base)){
-    if(validRecord(r.data)){
-     await transaction(['notes'],'readwrite',tx=>tx.objectStore('notes').put(r.data));
-     await putSetting(shadowKey(id),r.revision);await putSetting(snapshotKey(id),r.data);
-     downloaded++;
-    }
-   }else if(base!==undefined && equal(r.data,base)){
-    // Locally modified; upload in second pass.
-   }else{
-    await putSetting(conflictKey(id),{local:localNote,remote:r.data,seenAt:new Date().toISOString()});
-    conflicts++;
+   if(!validRecord(r.data)||r.data.id!==id){
+    await put(conflictKey(id),{id,reason:'Invalid cloud note',local:locals.get(id)||null,remote:r.data});continue;
    }
+   const l=locals.get(id),base=await setting(snapshotKey(id));
+   if(!l){
+    // If a local note was deleted, never silently restore it without reviewing.
+    if(base!==undefined){await put(conflictKey(id),{id,reason:'Local note missing',local:null,remote:r.data});continue}
+    await transaction(['notes'],'readwrite',tx=>tx.objectStore('notes').put(r.data));
+    await put(snapshotKey(id),r.data);await put(revisionKey(id),r.revision);downloaded++;continue;
+   }
+   if(equal(l,r.data)){
+    await put(snapshotKey(id),r.data);await put(revisionKey(id),r.revision);
+    await del(conflictKey(id));continue;
+   }
+   if(base!==undefined&&equal(l,base)){
+    // Local has not changed since last sync; accept remote update.
+    await transaction(['notes'],'readwrite',tx=>tx.objectStore('notes').put(r.data));
+    await put(snapshotKey(id),r.data);await put(revisionKey(id),r.revision);
+    await del(conflictKey(id));downloaded++;continue;
+   }
+   if(base!==undefined&&equal(r.data,base)){
+    // Cloud unchanged, local edit can be uploaded below.
+    await del(conflictKey(id));continue;
+   }
+   // Unknown common ancestor or both sides changed: do not overwrite either.
+   await put(conflictKey(id),{id,reason:'Different local and cloud versions',local:l,remote:r.data});
   }
-  const refreshed=await getAll('notes');
-  for(const r of refreshed){
-   const remoteRecord=remote.get(r.id);
-   if(remoteRecord && !equal(remoteRecord.data,r)){
-    const base=await localSetting(snapshotKey(r.id));
-    if(base===undefined || !equal(base,remoteRecord.data))continue;
+  const now=await getAll('notes');
+  for(const note of now){
+   const r=remote.get(note.id);
+   if(r&&equal(r.data,note))continue;
+   if(r){
+    const base=await setting(snapshotKey(note.id));
+    if(base===undefined||!equal(base,r.data))continue;
    }
-   if(remoteRecord && equal(remoteRecord.data,r))continue;
-   const expected=remoteRecord?remoteRecord.revision:0;
+   // New notes are uploaded with expected revision 0, edited notes with observed revision.
    const {data:revision,error}=await client.rpc('field_scout_save',{
-    p_category:'scouting_note',p_record_key:r.id,p_data:r,p_expected_revision:expected
+    p_category:'scouting_note',p_record_key:note.id,p_data:note,p_expected_revision:r?r.revision:0
    });
    if(error){
-    if(/conflict|duplicate|revision/i.test(error.message||'')){conflicts++;continue}
+    if(/conflict|duplicate|revision/i.test(error.message||'')){
+     await put(conflictKey(note.id),{id:note.id,reason:'Cloud changed during upload',local:note,remote:r?.data||null});continue;
+    }
     throw error;
    }
-   await putSetting(shadowKey(r.id),revision);
-   await putSetting(snapshotKey(r.id),r);
-   uploaded++;
+   await put(snapshotKey(note.id),note);await put(revisionKey(note.id),revision);
+   await del(conflictKey(note.id));uploaded++;
   }
   records=(await getAll('notes')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
   renderDashboard();if(current)renderHistory();
-  status(conflicts?`Needs review: ${conflicts} note conflict(s). Local notes preserved. ${uploaded} uploaded, ${downloaded} downloaded.`:
-    `Up to date — scouting notes. ${uploaded} uploaded, ${downloaded} downloaded. Other data is not synced.`);
- }catch(e){status('Sync not complete — local notes preserved. '+(e.message||String(e)))}
- finally{busy=false}
+  await report('Cloud check finished. '+uploaded+' uploaded, '+downloaded+' downloaded. Only scouting notes sync.');
+ }catch(e){await report('Sync incomplete — local notes kept. '+(e.message||e))}
+ finally{busy=false;if(pending){pending=false;setTimeout(runSync,500)}}
 }
-async function setup(){
- try{
-  const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-  client=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
-  const s=await session();if(s)status('Signed in. Checking scouting notes…');
-  client.auth.onAuthStateChange(()=>{setTimeout(()=>runSync(),100)});
-  if(s)await runSync();
- }catch(e){status('Online sign-in library unavailable. Local-only mode. '+e.message)}
-}
-$v('v7Login').onclick=async()=>{
- if(!client){status('Sign-in library not loaded; connect to internet and reload.');return}
- const email=$v('v7Email').value.trim(),password=$v('v7Password').value;
- if(!email||!password){status('Enter your Supabase login email and password.');return}
+el('v7Login').onclick=async()=>{
+ if(!client){status('Sign-in library not loaded. Connect to internet and reload.');return}
+ const email=el('v7Email').value.trim(),password=el('v7Password').value;
+ if(!email||!password){status('Enter your email and password.');return}
  status('Signing in…');
  const {error}=await client.auth.signInWithPassword({email,password});
- $v('v7Password').value='';
+ el('v7Password').value='';
  if(error){status('Sign-in failed: '+error.message);return}
  await runSync();
 };
-$v('v7Logout').onclick=async()=>{if(client)await client.auth.signOut();status('Signed out. Local test data remains on this device.')};
-$v('v7Sync').onclick=runSync;
-window.addEventListener('online',()=>runSync());
+el('v7Logout').onclick=async()=>{if(client)await client.auth.signOut();await report('Signed out. Local notes remain on this device.')};
+el('v7Sync').onclick=runSync;
+el('v7ExportConflicts').onclick=async()=>{
+ const c=await conflicts();
+ if(!c.length){await report('No conflicts to export.');return}
+ const blob=new Blob([JSON.stringify({format:'FieldScoutV7ConflictReview',exportedAt:new Date().toISOString(),conflicts:c},null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=window.URL.createObjectURL(blob);a.download='field-scout-conflicts-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>window.URL.revokeObjectURL(a.href),1000);
+};
+window.addEventListener('online',runSync);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)runSync()});
 setInterval(()=>{if(!document.hidden&&navigator.onLine)runSync()},60000);
-function scheduleSync(){clearTimeout(timer);timer=setTimeout(()=>runSync(),1800)}
-// Observe completed local note transactions, including edits and imports.
-// Existing note saves remain local-first; the sync never blocks them.
+// Listen for local note saves without modifying the original transaction function.
 const originalTransaction=transaction;
-transaction=async function(stores,mode,callback){
- const result=await originalTransaction(stores,mode,callback);
- if(mode==='readwrite'&&stores.includes('notes'))scheduleSync();
+transaction=async function(stores,mode,fn){
+ const result=await originalTransaction(stores,mode,fn);
+ if(mode==='readwrite'&&stores.includes('notes'))schedule();
  return result;
 };
-await setup();
-</script>
-<script type="module">
-const SUPABASE_URL='https://avhffntmlrushevnqufx.supabase.co';
-const SUPABASE_KEY='sb_publishable_VvijwxXqJPuCeBCAZRlFCA_C0aN26_c';
-const $v=id=>document.getElementById(id);
-const status=(s)=>{$v('v7SyncStatus').textContent=s};
-let client=null, busy=false, timer=null;
-const shadowKey=id=>'v7-cloud-revision:'+id;
-const snapshotKey=id=>'v7-cloud-snapshot:'+id;
-const conflictKey=id=>'v7-conflict:'+id;
-async function localSetting(k){return await getSetting(k)}
-async function putSetting(k,v){await transaction(['settings'],'readwrite',tx=>tx.objectStore('settings').put({key:k,value:v}))}
-const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
-async function session(){return (await client.auth.getSession()).data.session}
-async function runSync(){
- if(busy||!ready||!client)return;
- busy=true;
- try{
-  const s=await session();
-  if(!s){status('Not signed in — changes are local only.');return}
-  if(!navigator.onLine){status('Offline — scouting notes saved locally; sync pending.');return}
-  status('Syncing scouting notes…');
-  // Fetch all notes before uploading. This prevents a stale device from overwriting unseen cloud changes.
-  const {data:cloud,error:fetchError}=await client.from('field_scout_sync')
-   .select('record_key,data,revision').eq('category','scouting_note');
-  if(fetchError)throw fetchError;
-  const remote=new Map((cloud||[]).map(x=>[x.record_key,x]));
-  const local=await getAll('notes');
-  const localMap=new Map(local.map(x=>[x.id,x]));
-  let uploaded=0,downloaded=0,conflicts=0;
-  for(const [id,r] of remote){
-   const localNote=localMap.get(id);
-   const base=await localSetting(snapshotKey(id));
-   if(!localNote){
-    if(validRecord(r.data)){
-     await transaction(['notes'],'readwrite',tx=>tx.objectStore('notes').put(r.data));
-     await putSetting(shadowKey(id),r.revision);await putSetting(snapshotKey(id),r.data);
-     downloaded++;
-    }
-   }else if(equal(localNote,r.data)){
-    await putSetting(shadowKey(id),r.revision);await putSetting(snapshotKey(id),r.data);
-   }else if(base!==undefined && equal(localNote,base)){
-    if(validRecord(r.data)){
-     await transaction(['notes'],'readwrite',tx=>tx.objectStore('notes').put(r.data));
-     await putSetting(shadowKey(id),r.revision);await putSetting(snapshotKey(id),r.data);
-     downloaded++;
-    }
-   }else if(base!==undefined && equal(r.data,base)){
-    // Locally modified; upload in second pass.
-   }else{
-    await putSetting(conflictKey(id),{local:localNote,remote:r.data,seenAt:new Date().toISOString()});
-    conflicts++;
-   }
-  }
-  const refreshed=await getAll('notes');
-  for(const r of refreshed){
-   const remoteRecord=remote.get(r.id);
-   if(remoteRecord && !equal(remoteRecord.data,r)){
-    const base=await localSetting(snapshotKey(r.id));
-    if(base===undefined || !equal(base,remoteRecord.data))continue;
-   }
-   if(remoteRecord && equal(remoteRecord.data,r))continue;
-   const expected=remoteRecord?remoteRecord.revision:0;
-   const {data:revision,error}=await client.rpc('field_scout_save',{
-    p_category:'scouting_note',p_record_key:r.id,p_data:r,p_expected_revision:expected
-   });
-   if(error){
-    if(/conflict|duplicate|revision/i.test(error.message||'')){conflicts++;continue}
-    throw error;
-   }
-   await putSetting(shadowKey(r.id),revision);
-   await putSetting(snapshotKey(r.id),r);
-   uploaded++;
-  }
-  records=(await getAll('notes')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
-  renderDashboard();if(current)renderHistory();
-  status(conflicts?`Needs review: ${conflicts} note conflict(s). Local notes preserved. ${uploaded} uploaded, ${downloaded} downloaded.`:
-    `Up to date — scouting notes. ${uploaded} uploaded, ${downloaded} downloaded. Other data is not synced.`);
- }catch(e){status('Sync not complete — local notes preserved. '+(e.message||String(e)))}
- finally{busy=false}
-}
-async function setup(){
- try{
-  const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-  client=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
-  const s=await session();if(s)status('Signed in. Checking scouting notes…');
-  client.auth.onAuthStateChange(()=>{setTimeout(()=>runSync(),100)});
-  if(s)await runSync();
- }catch(e){status('Online sign-in library unavailable. Local-only mode. '+e.message)}
-}
-$v('v7Login').onclick=async()=>{
- if(!client){status('Sign-in library not loaded; connect to internet and reload.');return}
- const email=$v('v7Email').value.trim(),password=$v('v7Password').value;
- if(!email||!password){status('Enter your Supabase login email and password.');return}
- status('Signing in…');
- const {error}=await client.auth.signInWithPassword({email,password});
- $v('v7Password').value='';
- if(error){status('Sign-in failed: '+error.message);return}
+try{
+ const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+ client=createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+ client.auth.onAuthStateChange(()=>{setTimeout(runSync,100)});
  await runSync();
-};
-$v('v7Logout').onclick=async()=>{if(client)await client.auth.signOut();status('Signed out. Local test data remains on this device.')};
-$v('v7Sync').onclick=runSync;
-window.addEventListener('online',()=>runSync());
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)runSync()});
-setInterval(()=>{if(!document.hidden&&navigator.onLine)runSync()},60000);
-function scheduleSync(){clearTimeout(timer);timer=setTimeout(()=>runSync(),1800)}
-// Observe completed local note transactions, including edits and imports.
-// Existing note saves remain local-first; the sync never blocks them.
-const originalTransaction=transaction;
-transaction=async function(stores,mode,callback){
- const result=await originalTransaction(stores,mode,callback);
- if(mode==='readwrite'&&stores.includes('notes'))scheduleSync();
- return result;
-};
-await setup();
+}catch(e){await report('Cloud sign-in unavailable. Local-only mode. '+e.message)}
 </script>
 </body></html>
