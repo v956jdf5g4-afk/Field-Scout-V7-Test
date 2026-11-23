@@ -11,21 +11,21 @@ nav{display:flex;gap:10px;margin:0 0 18px;flex-wrap:wrap}nav button{background:#
 
 .field-header-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}.field-recipe-anchor{position:relative}.field-recipe-trigger{white-space:nowrap;border:1px solid #bdd3c4;background:#e9f2eb;color:#173f2d;font-weight:700}.field-recipe-trigger.has-recipe{background:#dff0e5;border-color:#8cb69a}.field-recipe-popover{position:absolute;right:0;top:calc(100% + 9px);z-index:40;width:min(350px,calc(100vw - 40px));box-sizing:border-box;background:white;border:1px solid #b7d6c2;box-shadow:0 10px 30px #1a382a29;border-radius:12px;padding:15px;text-align:left}.field-recipe-popover label{font-weight:700;display:block;margin-bottom:8px}.field-recipe-popover select{width:100%;max-width:100%;margin-bottom:8px}.field-recipe-popover p{margin:5px 0 10px}.field-recipe-popover.hide{display:none!important}@media(max-width:540px){.field-header-actions{gap:6px}.field-recipe-trigger{font-size:12px;padding:8px}.field-recipe-popover{right:-45px}}
 
-/* v7.2 layout cleanup */
+/* v7.3 foundation build, preserves earlier app layout */
 .header-actions{display:flex;align-items:center;gap:9px}.header-actions #v705Gear{font-size:24px;padding:5px 12px;background:#e9f1e9;color:#19452d}.sync-dot{color:#a87b1d;font-size:17px}.v705-subnav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.v705-subnav button{background:#e6eee7;color:#244b34}.v705-subnav button.selected{background:#246a43;color:white}#v705Maintenance{max-width:1050px;margin:14px auto;padding:0 12px}#v705Maintenance:not(.hide){display:block}#v705SettingsHeading{max-width:1000px;margin:12px auto}.v705-settings-tools{max-width:1000px;margin:12px auto;padding:14px;background:#fff;border:1px solid #dce5dc;border-radius:12px}#v705Back{white-space:nowrap}.collapse-summary{font-size:19px}.v705-settings-tools .notice{display:block!important}#v705SettingsHeading button{float:right}@media(max-width:650px){.header-actions #saveStatus{display:none}.v705-subnav button{flex:1;padding:10px 7px;font-size:13px}.scout-toolbar{flex-wrap:wrap}}
-</style><style>.spray-section h2[role=button]{cursor:pointer;padding:12px 34px 12px 0;position:relative}.spray-section h2[role=button]:after{content:"▾";position:absolute;right:8px}.spray-section h2[aria-expanded=false]:after{content:"▸"}.v71-spray-body[hidden]{display:none!important}</style></head><body><header><div><strong>🌱 Field Scout</strong><div><small>Version 7.2.5 · Field Editing</small></div></div><div class="header-actions"><span id="v705SyncDot" class="sync-dot" title="Sync details in Settings">●</span><button id="v705Gear" type="button" aria-label="Open Settings" aria-expanded="false">⚙</button><small id="saveStatus">Starting…</small></div></header><main><div class="notice hide" style="padding:10px"><b>v7 test app:</b> Scouting notes sync when signed in. Plans, annual field changes and spray data are local to this device. Keep using v6.3 for real work.</div><details id="v7BackupTools" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:650">Backup & restore tools</summary><div class="backupbar" style="margin-top:10px"><button id="backupAll" type="button">⬇ Back up all data</button><label class="importButton" for="restoreFile">⬆ Restore backup</label><label class="importButton" for="importFile">⇄ Import scouting notes</label><input type="file" id="importFile" accept=".json,application/json" hidden><input type="file" id="restoreFile" accept=".json,application/json" hidden><span id="backupStatus" class="muted" role="status"></span><span id="lastBackup" class="muted"></span></div></details><div class="yearbar"><label for="cropYear">Crop year</label><select id="cropYear"><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select><button class="mini" id="editAnnual" type="button">🔒 Edit Field Info</button><span id="annualStatus" class="muted"></span></div><nav><button id="homeTab" class="selected" type="button">🏠 Scouting Plan</button><button id="planningTab" type="button">📋 Planning</button><button id="scoutTab" type="button">🌾 Fields / Notes</button><button id="sprayTab" type="button">🧪 Recipes & Spray Orders</button></nav>
+</style><style>.spray-section h2[role=button]{cursor:pointer;padding:12px 34px 12px 0;position:relative}.spray-section h2[role=button]:after{content:"▾";position:absolute;right:8px}.spray-section h2[aria-expanded=false]:after{content:"▸"}.v71-spray-body[hidden]{display:none!important}</style></head><body><header><div><strong>🌱 Field Scout</strong><div><small>Version 7.3.0 · Foundation Test</small></div></div><div class="header-actions"><span id="v705SyncDot" class="sync-dot" title="Sync details in Settings">●</span><button id="v705Gear" type="button" aria-label="Open Settings" aria-expanded="false">⚙</button><small id="saveStatus">Starting…</small></div></header><main><div class="notice hide" style="padding:10px"><b>v7 test app:</b> Scouting notes sync when signed in. Plans, annual field changes and spray data are local to this device. Keep using v6.3 for real work.</div><details id="v7BackupTools" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:650">Backup & restore tools</summary><div class="backupbar" style="margin-top:10px"><button id="backupAll" type="button">⬇ Back up all data</button><label class="importButton" for="restoreFile">⬆ Restore backup</label><label class="importButton" for="importFile">⇄ Import scouting notes</label><input type="file" id="importFile" accept=".json,application/json" hidden><input type="file" id="restoreFile" accept=".json,application/json" hidden><span id="backupStatus" class="muted" role="status"></span><span id="lastBackup" class="muted"></span></div></details><div class="yearbar"><label for="cropYear">Crop year</label><select id="cropYear"><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select><button class="mini" id="editAnnual" type="button">🔒 Edit Field Info</button><span id="annualStatus" class="muted"></span><span id="yearConfirmationStatus" class="muted" role="status"></span></div><nav><button id="homeTab" class="selected" type="button">🏠 Scouting Plan</button><button id="planningTab" type="button">📋 Planning</button><button id="scoutTab" type="button">🌾 Fields / Notes</button><button id="sprayTab" type="button">🧪 Recipes & Spray Orders</button></nav>
 <section id="homeView"><div class="v705-subnav" role="group" aria-label="Scouting Plan views"><button type="button" class="selected" data-v705-view="today">Today’s Plan</button><button type="button" data-v705-view="due">Due / Overdue</button><button type="button" data-v705-view="upcoming">Upcoming</button></div><div id="v705Today"><div class="dashboard-grid"><div class="metric"><b id="countPlanned">0</b><small>Remaining today</small></div><button class="metric jump" id="jumpCompleted" type="button" aria-label="Jump to completed today"><b id="countCompleted">0</b><small>Completed today ↓</small></button><div class="metric"><b id="countDue">0</b><small>Due / overdue</small></div></div><div><section class="panel"><div class="section-heading"><h2>Today's Scouting Plan</h2><span id="planDate" class="pill"></span></div><p class="muted">Your selected fields, grouped by farmer and crop. Saving a scouting note moves a field to Completed.</p><div id="plannedFields"></div><details id="v705Completed" class="collapse-panel" style="margin-top:22px"><summary id="completedSection" class="collapse-summary">Completed Today</summary><div id="completedFields"></div></details></section></div></div><section id="v705Due" class="panel hide" style="margin-top:16px"><h2>Due / Overdue</h2><p class="muted">Based on the most recent scouting note for each field. Add any of these to your plan.</p><div id="dueFields"></div></section><section id="v705Upcoming" class="panel hide" style="margin-top:16px"><h2>Upcoming Visits — Next 7 Days</h2><div id="upcomingFields"></div></section></section>
-<section id="planningView" class="hide"><section class="panel"><div class="section-heading"><h2>Plan Your Scouting</h2><button class="mini" id="backToHome" type="button">← Back to Scouting Plan</button></div><p class="muted">Choose the fields you want on your daily scouting plan.</p><label for="farmerFilter">Filter by farmer</label><select id="farmerFilter"><option value="">All farmers</option><option value="HT">HT — Hans Thompson</option><option value="JF">JF — JFrey</option><option value="JP">JP — James Prasek</option><option value="JR">JR — Jason Rabenberg</option></select><label for="cropFilter">Filter by crop</label><select id="cropFilter"><option value="">All crops</option></select><label for="planSearch">Search fields</label><input id="planSearch" placeholder="Field ID or name"><div class="actions"><button class="mini" id="selectVisible">Select all shown</button><button class="mini" id="clearSelection">Clear selection</button></div><div id="addFields" class="plan-add-list"></div><div class="actions"><button class="primary" id="addToPlan">Add selected fields</button></div><p id="planFeedback" class="info" role="status"></p></section></section>
-<div id="scoutView" class="layout hide"><section id="fieldPicker" class="panel"><h2>Fields</h2><input id="search" placeholder="Search field ID or name" aria-label="Search fields"><p class="muted">All 74 fields · selected crop year</p><div id="fields" class="list"></div></section><section class="panel"><div class="scout-toolbar"><button id="v705Back" type="button" class="mini">← Back</button><button id="toggleFieldList" type="button" aria-expanded="false">☰ Show field list</button><span class="muted">More room for scouting notes</span></div><div class="row"><div><h2 id="fieldTitle">Select a field</h2><div id="fieldMeta" class="muted"></div></div><div class="field-header-actions"><span id="fieldEditButtonSlot"></span><div class="field-recipe-anchor"><button type="button" class="mini field-recipe-trigger" id="fieldRecipeToggle" aria-expanded="false" aria-controls="fieldRecipePanel">⚗ Spray Recipe</button><div id="fieldRecipePanel" class="field-recipe-popover hide"><label for="fieldRecipeSelect">Assigned chemical recipe</label><select id="fieldRecipeSelect"><option value="">Loading recipes…</option></select><p id="fieldRecipeInfo" class="muted" role="status">Choose a recipe for this field, or use the farmer/crop default.</p><button type="button" class="mini" id="fieldRecipeGo">Open Recipes &amp; Spray Orders</button></div></div><span id="fieldYearPill" class="pill">2026</span></div></div><div id="detail" class="hide"><div class="stats" id="stats"></div><label for="notes">New scouting observation</label><textarea id="notes" placeholder="Type here, or use the microphone on your iPad keyboard to dictate. You can correct the text before saving."></textarea><div class="actions"><button class="primary" id="save" type="button">Save Note &amp; Choose Next Visit →</button><button id="scheduleOnly" type="button">No observations — Schedule Next Visit</button></div><p id="feedback" class="muted" role="status"></p><h2 style="margin-top:24px">Scouting history</h2><p class="muted">Most recent three notes shown first. Scroll down for older records.</p><div id="history"></div></div><p id="placeholder" class="empty">Choose a field to begin.</p></section></div><section id="sprayView" class="hide">
+<section id="planningView" class="hide"><details id="yearReview" class="panel" style="margin-bottom:15px"><summary style="cursor:pointer;font-size:18px;font-weight:700">Review crop-year field information</summary><p class="muted">For future years, crop and acres are not assumed from the previous year. Review and confirm each field before creating spray orders. Fields from 2026 are the original starting records.</p><p id="yearReviewStatus" class="muted" role="status"></p><div id="yearReviewFields" style="max-height:440px;overflow-y:auto"></div></details><section class="panel"><div class="section-heading"><h2>Plan Your Scouting</h2><button class="mini" id="backToHome" type="button">← Back to Scouting Plan</button></div><p class="muted">Choose the fields you want on your daily scouting plan.</p><label for="farmerFilter">Filter by farmer</label><select id="farmerFilter"><option value="">All farmers</option><option value="HT">HT — Hans Thompson</option><option value="JF">JF — JFrey</option><option value="JP">JP — James Prasek</option><option value="JR">JR — Jason Rabenberg</option></select><label for="cropFilter">Filter by crop</label><select id="cropFilter"><option value="">All crops</option></select><label for="planSearch">Search fields</label><input id="planSearch" placeholder="Field ID or name"><div class="actions"><button class="mini" id="selectVisible">Select all shown</button><button class="mini" id="clearSelection">Clear selection</button></div><div id="addFields" class="plan-add-list"></div><div class="actions"><button class="primary" id="addToPlan">Add selected fields</button></div><p id="planFeedback" class="info" role="status"></p></section></section>
+<div id="scoutView" class="layout hide"><section id="fieldPicker" class="panel"><h2>Fields</h2><input id="search" placeholder="Search field ID or name" aria-label="Search fields"><p class="muted">All fields · selected crop year</p><div id="fields" class="list"></div></section><section class="panel"><div class="scout-toolbar"><button id="v705Back" type="button" class="mini">← Back</button><button id="toggleFieldList" type="button" aria-expanded="false">☰ Show field list</button><span class="muted">More room for scouting notes</span></div><div class="row"><div><h2 id="fieldTitle">Select a field</h2><div id="fieldMeta" class="muted"></div></div><div class="field-header-actions"><span id="fieldEditButtonSlot"></span><div class="field-recipe-anchor"><button type="button" class="mini field-recipe-trigger" id="fieldRecipeToggle" aria-expanded="false" aria-controls="fieldRecipePanel">⚗ Spray Recipe</button><div id="fieldRecipePanel" class="field-recipe-popover hide"><label for="fieldRecipeSelect">Assigned chemical recipe</label><select id="fieldRecipeSelect"><option value="">Loading recipes…</option></select><p id="fieldRecipeInfo" class="muted" role="status">Choose a recipe for this field, or use the farmer/crop default.</p><button type="button" class="mini" id="fieldRecipeGo">Open Recipes &amp; Spray Orders</button></div></div><span id="fieldYearPill" class="pill">2026</span></div></div><div id="detail" class="hide"><div class="stats" id="stats"></div><label for="notes">New scouting observation</label><textarea id="notes" placeholder="Type here, or use the microphone on your iPad keyboard to dictate. You can correct the text before saving."></textarea><div class="actions"><button class="primary" id="save" type="button">Save Note &amp; Choose Next Visit →</button><button id="scheduleOnly" type="button">No observations — Schedule Next Visit</button></div><p id="feedback" class="muted" role="status"></p><h2 style="margin-top:24px">Scouting history</h2><div class="row" style="margin:9px 0"><p class="muted" style="margin:0">All crop years, newest first. Scroll to see older notes.</p><select id="historyYearFilter" aria-label="Filter scouting history" style="width:auto;max-width:180px"><option value="all">All years</option><option value="current">Current year only</option></select></div><div id="history"></div></div><p id="placeholder" class="empty">Choose a field to begin.</p></section></div><section id="sprayView" class="hide">
 <div class="panel spray-section"><h2>Recipes & Spray Orders</h2><p class="muted">Create recipes, assign them to a farmer’s crop or individual fields, and calculate exact product totals and container quantities. Everything is saved locally for offline use.</p><div class="actions"><button id="sprayBackup">⬇ Back up spray data</button><label class="importButton" for="sprayRestore">⬆ Restore spray data</label><input id="sprayRestore" type="file" accept=".json,application/json" hidden></div><p id="sprayStatus" class="muted" role="status"></p></div>
 <div class="panel spray-section"><h2>1. Product library</h2><p class="muted">Optional shortcut: remember a product's usual rate unit and package size. Recipe entries can override them.</p><div id="sprayProducts"></div><div class="spray-grid"><div><label>Product name</label><input id="sprayProductName" placeholder="Product name"></div><div><label>Default rate unit</label><select id="sprayProductRateUnit"></select></div><div><label>Package size</label><input id="sprayProductSize" type="number" min="0" step="any" placeholder="2.5"></div><div><label>Package unit</label><select id="sprayProductUnit"></select></div></div><div class="actions"><button id="spraySaveProduct">Save product</button></div></div>
 <div class="panel spray-section"><h2>2. Saved recipes</h2><div id="sprayRecipeList"></div><div id="sprayRecipeEditor"><h3>Create / Edit Recipe</h3><div class="spray-grid"><div><label>Recipe name</label><input id="sprayRecipeName" placeholder="Wheat post-emerge #1"></div><div><label>Crop</label><select id="sprayRecipeCrop"></select></div><div><label>Spray solution volume (GPA)</label><input id="sprayGpa" type="number" min="0.1" step="any" value="10"></div></div><label>Products & rates</label><datalist id="sprayProductSuggestions"></datalist><div id="sprayLines"></div><button id="sprayAddLine" type="button">+ Add product</button><label>Instructions / notes</label><textarea id="sprayRecipeNotes" placeholder="Application instructions, notes, etc." style="min-height:85px"></textarea><div class="actions"><button class="primary" id="sprayRecipeSave">Save recipe</button><button id="sprayRecipeCancel">Clear editor</button></div></div></div>
 <div class="panel spray-section"><h2>3. Assign recipes to fields</h2><div class="spray-grid"><div><label>Farmer</label><select id="sprayFarmer"></select></div><div><label>Crop</label><select id="sprayCrop"></select></div></div><p id="sprayGroupInfo" class="muted"></p><label>Default recipe for all fields of this crop</label><select id="sprayDefaultRecipe"></select><p class="muted">Set a default for the whole crop. Change individual fields below when needed, or choose “Do not spray.”</p><div id="sprayAssignments"></div></div>
 <div class="panel spray-section"><h2>4. Preview & save spray order</h2><div id="sprayPreview"></div><p class="spray-instructions">Container counts are rounded at the farmer level. If you use a rate per 100 gallons, the recipe's GPA determines the product amount. Verify rates and label restrictions before issuing.</p><div class="actions"><button class="primary" id="spraySaveOrder">Save spray order</button></div></div>
 <div class="panel spray-section"><h2>5. Saved spray orders</h2><p class="muted">Saved orders preserve their original recipe, rates, and field acreages even if you later change a recipe.</p><div id="sprayOrderHistory"></div><div id="spraySavedOrder"></div></div>
-</section></main><div id="v705Maintenance" class="hide"><section id="v7TestCenter" style="margin:14px auto;padding:16px;max-width:1000px;border:1px solid #8ba99a;border-radius:12px;background:#fff"><details><summary style="cursor:pointer;font-size:19px;font-weight:700">🧪 Test Center & daily recovery snapshots</summary><p style="font-size:14px">Diagnostics only read your existing data and test isolated temporary records. They do not upload, edit or delete scouting notes.</p><button type="button" id="v7RunTests">Run diagnostics</button><p id="v7TestResult" role="status" style="white-space:pre-wrap"></p><p id="v7DailyStatus" style="font-size:14px"></p><button type="button" id="v7DownloadSnapshot">Download latest local recovery snapshot</button><p style="font-size:13px">Daily snapshots are stored in this browser, not automatically in the cloud. Clearing website data or losing the device can erase them. Download separate backups regularly. Cloud backup is not enabled yet.</p></details></section><section id="v7SyncPanel" style="margin:14px auto;padding:16px;max-width:1000px;border:2px solid #8ba99a;border-radius:12px;background:#f6fbf7;color:#163d2a">
+</section></main><div id="v705Maintenance" class="hide"><section id="v7TestCenter" style="margin:14px auto;padding:16px;max-width:1000px;border:1px solid #8ba99a;border-radius:12px;background:#fff"><details><summary style="cursor:pointer;font-size:19px;font-weight:700">🧪 Test Center & daily recovery snapshots</summary><p style="font-size:14px">Diagnostics only read your existing data and test isolated temporary records. They do not upload, edit or delete scouting notes.</p><button type="button" id="v7RunTests">Run diagnostics</button><p id="v7TestResult" role="status" style="white-space:pre-wrap"></p><p id="v7DailyStatus" style="font-size:14px"></p><button type="button" id="v7DownloadSnapshot">Download latest local recovery snapshot</button><p style="font-size:13px">Local recovery snapshots are stored in this browser. Clearing website data can erase them. Cloud snapshots may exist in the same Supabase project but are not independent disaster recovery. Download separate backups regularly.</p></details></section><section id="v7SyncPanel" style="margin:14px auto;padding:16px;max-width:1000px;border:2px solid #8ba99a;border-radius:12px;background:#f6fbf7;color:#163d2a">
 <h2 style="margin:0 0 8px">☁️ Sync status</h2>
-<p style="margin:0 0 10px">This separate test app uses its own local storage. Your v6.3 data is untouched. Daily plans, annual field changes and spray data do <b>not</b> sync yet. Keep using v6.3 for real work.</p>
+<p style="margin:0 0 10px">This test app stores field data on this device while offline and attempts cloud sync when signed in and online. Verify the sync result below before switching devices. Keep independent JSON backups.</p>
 <details style="margin-top:10px"><summary style="cursor:pointer">Account & sync controls</summary><div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px">
 <div id="fsAuthIdentity" role="status" style="font-size:13px;margin:6px 0">Cloud account: checking…</div>
 <input id="v7Email" type="email" autocomplete="username" placeholder="Supabase login email" style="min-width:190px;padding:9px">
@@ -39,11 +39,49 @@ nav{display:flex;gap:10px;margin:0 0 18px;flex-wrap:wrap}nav button{background:#
 const fields=[["FC 6", "Rabenberg Q", 44, "Spring wheat", "JF"], ["FC 11", "Knittle Klein W", 180, "Soybeans", "JF"], ["FC 10", "Paulson N", 153, "Soybeans", "JF"], ["FW 8", "Lahren's Field", 128, "Spring wheat", "JF"], ["FW 1", "Lindeman N", 152, "Soybeans", "JF"], ["FW 15", "Peterson", 160, "Corn", "JF"], ["FW 16", "Hanson S", 132, "Soybeans", "JF"], ["FW 17", "McHanson N", 130, "Winter wheat", "JF"], ["FW 13", "Hanson N", 185, "Spring wheat", "JF"], ["FW 18", "McHanson S", 148, "Spring wheat", "JF"], ["FW 10", "Molstad", 173, "Soybeans", "JF"], ["FW 6", "Larson Milton N", 160, "Winter wheat", "JF"], ["FC 9", "Rabenberg Corners", 182, "Soybeans", "JF"], ["FW 9", "Patterson N", 158, "Spring wheat", "JF"], ["FW 14", "Shillingstad", 52, "Soybeans", "JF"], ["FW 11", "Nelson", 152, "Corn", "JF"], ["FC 5", "Bunny", 155, "Corn", "JF"], ["FW 2", "Paulson", 148, "Spring wheat", "JF"], ["FC 1", "Rabenberg NW", 158, "Corn", "JF"], ["FW 3", "Hohle", 73, "Soybeans", "JF"], ["FC 4", "Steiger", 134, "Soybeans", "JF"], ["FW 5", "Olson", 160, "Corn", "JF"], ["FC 3", "\"19\"", 145, "Soybeans", "JF"], ["FC 13", "Winchell", 155, "Soybeans", "JF"], ["FC 8", "Anderson", 155, "Soybeans", "JF"], ["FC 7", "Rabenberg U", 53, "Corn", "JF"], ["FW 4", "Lindeman 40", 40, "Corn", "JF"], ["FW 12", "Pattersn S", 150, "Corn", "JF"], ["FW 7", "Larson Milton S", 135, "Winter wheat", "JF"], ["FC 2", "Rabenberg NE", 156, "Spring wheat", "JF"], ["FC 12", "Knittle Klein E ", 126, "Corn", "JF"], ["TC 1", "C-Hart", 72, "Corn", "HT"], ["TC 2", "Gunderson", 157, "Soybeans", "HT"], ["TC 3", "Amundson", 158, "Corn", "HT"], ["TW 5", "Morton Building", 60, "Corn", "HT"], ["TC 5", "Doc's", 147, "Corn", "HT"], ["TC 6", "Helgie's", 147, "Soybeans", "HT"], ["TC 4", "Bins", 157, "Corn", "HT"], ["TC 7", "N County Line", 156, "Soybeans", "HT"], ["TW 1", "Schlomer's Old Place", 142, "Corn", "HT"], ["TW 8", "Rye's", 222, "Soybeans", "HT"], ["TW 3", "West of Stroeder", 147, "Soybeans", "HT"], ["TW 2", "Grainery", 155, "Soybeans", "HT"], ["TW 12", "Kirby's", 56, "Corn", "HT"], ["TW 4", "N Lahren Driveway", 78, "Soybeans", "HT"], ["TW 6", "SW Stroeder", 92, "Soybeans", "HT"], ["TW 7", "W of Frey's", 156, "Soybeans", "HT"], ["TW 9", "Turner", 77, "Soybeans", "HT"], ["TW 10", "Tower Hill N", 155, "Corn", "HT"], ["TW 11", "Tower Hill S", 124, "Corn", "HT"], ["PC 5", "Horn 1/2", 285, "Corn", "JP"], ["PC 7", "Glenham", 365, "Soybeans", "JP"], ["PC 6", "McArthur", 157, "Corn", "JP"], ["PC 3", "Duper", 141, "Corn", "JP"], ["PC 4", "MyronHIll", 68, "Soybeans", "JP"], ["PC 2", "Home 1/4", 133, "Corn", "JP"], ["PC 1", "Prasek 1/2", 275, "Soybeans", "JP"], ["RW 14", "Glenham", 147, "Spring wheat", "JR"], ["RW 15", "Cemetary", 140, "Spring wheat", "JR"], ["RW 13", "Molstad", 140, "Soybeans", "JR"], ["RW 8", "Quashnick", 140, "Soybeans", "JR"], ["RW 9", "Rabenberg N", 104, "Soybeans", "JR"], ["RW 10", "Rabenberg E", 121, "Soybeans", "JR"], ["RW 12", "Rabenberg S", 49, "Soybeans", "JR"], ["RW 1", "Carters", 154, "Spring wheat", "JR"], ["RW 3", "Waterman E", 147, "Soybeans", "JR"], ["RW 6", "Droog 1/4", 126, "Spring wheat", "JR"], ["RW 17", "Reinbold E", 182, "Soybeans", "JR"], ["RW 18", "Reinbold W", 88, "Spring wheat", "JR"], ["RW 16", "S of Mike's", 70, "Spring wheat", "JR"], ["RW 2", "Home 60", 65, "Corn", "JR"], ["RW 7", "Ralph W", 50, "Corn", "JR"], ["RW 4", "Ralph E", 70, "Corn", "JR"], ["RW 11", "Jim's 1/4", 145, "Corn", "JR"]];
 fields.forEach(f=>f[0]=f[0].replace(/\s+/g,''));fields.sort((a,b)=>a[0].localeCompare(b[0],undefined,{numeric:true,sensitivity:'base'}));
 fields.forEach(f=>f[0]=f[0].replace(/\s+/g,''));fields.sort((a,b)=>a[0].localeCompare(b[0],undefined,{numeric:true}));
-let cropYear=2026;let annual={};let fieldIdentity={};const farmerNames={HT:'Hans Thompson',JF:'JFrey',JP:'James Prasek',JR:'Jason Rabenberg'};
-function annualField(f){const a=annual[cropYear+'|'+f[0]];const i=fieldIdentity[f[0]]||{};return [f[0],i.name??f[1],a?.acres??f[2],a?.crop??f[3],i.operator??f[4]]}
+let cropYear=2026;let annual={};let fieldIdentity={};let fieldIdentityHistory={};const farmerNames={HT:'Hans Thompson',JF:'JFrey',JP:'James Prasek',JR:'Jason Rabenberg'};
+// The original field list is the 2026 baseline, not an automatic plan for later years.
+// Prior-year crop and acreage may be suggested in the editor, but are NEVER used
+// for the current year until the user explicitly confirms them.
+const UNCONFIRMED_CROP='Unconfirmed';
+function identityForYear(f,year){
+ let name=fieldIdentity[f[0]]?.name??f[1],operator=fieldIdentity[f[0]]?.operator??f[4];
+ for(let y=2026;y<=year;y++){
+  const change=fieldIdentityHistory[y+'|'+f[0]];
+  if(change){name=change.name??name;operator=change.operator??operator}
+ }
+ return {name,operator};
+}
+function annualForYear(f,year){
+ const a=annual[year+'|'+f[0]];
+ if(a&&a.confirmed!==false&&a.crop&&Number.isFinite(Number(a.acres))&&Number(a.acres)>0)return {crop:a.crop,acres:Number(a.acres),confirmed:true};
+ if(year===2026)return {crop:f[3],acres:Number(f[2]),confirmed:true};
+ return {crop:UNCONFIRMED_CROP,acres:null,confirmed:false};
+}
+function annualField(f){
+ const i=identityForYear(f,cropYear),a=annualForYear(f,cropYear);
+ return [f[0],i.name,a.acres,a.crop,i.operator];
+}
 function yearFields(){return fields.map(annualField)}
+function fieldAcresLabel(f){return Number.isFinite(f[2])&&f[2]>0?f[2]+' acres':'Acres not confirmed'}
+function fieldYearConfirmed(id){const f=fields.find(f=>f[0]===id);return !!f&&annualForYear(f,cropYear).confirmed}
+function suggestedAnnual(f,year){
+ const explicit=annual[year+'|'+f[0]];
+ if(explicit)return {crop:explicit.crop||f[3],acres:explicit.acres??f[2]};
+ for(let y=year-1;y>=2026;y--){const previous=annualForYear(f,y);if(previous.confirmed)return {crop:previous.crop,acres:previous.acres};}
+ return {crop:f[3],acres:f[2]};
+}
+function renderSelectedFieldHeader(){
+ if(!current)return;
+ const f=yearFields().find(x=>x[0]===current);if(!f)return;
+ $('fieldTitle').textContent=f[0]+' — '+f[1];
+ $('fieldMeta').textContent=cropYear+' field information · '+(farmerNames[f[4]]||f[4])+(fieldYearConfirmed(f[0])?'':' · CROP & ACRES NOT CONFIRMED');
+ $('fieldYearPill').textContent=String(cropYear);
+ $('stats').replaceChildren();
+ for(const t of [f[3],fieldAcresLabel(f)]){const x=document.createElement('span');x.textContent=t;$('stats').append(x)}
+}
 function visibleRecords(){return records.filter(r=>Number(r.cropYear||2026)===cropYear&&!r.deletedAt)}
-function effectiveFollowup(id){const rr=visibleRecords().filter(r=>r.fieldId===id&&r.followup).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));return rr[0]?.followup||''}
+function effectiveFollowup(id){const rr=visibleRecords().filter(r=>r.fieldId===id).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)||b.id.localeCompare(a.id));const mostRecent=rr[0];return mostRecent&&!mostRecent.endYear?mostRecent.followup||'':''}
 const $=id=>document.getElementById(id), key='fieldscout_prototype_notes_v1';let current=null;let records=[];
 let db=null,ready=false,saving=false;
 function transaction(stores,mode,fn){return new Promise((resolve,reject)=>{const tx=db.transaction(stores,mode);let result;tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error||new Error('Database transaction failed'));tx.onabort=()=>reject(tx.error||new Error('Database transaction aborted'));try{result=fn(tx)}catch(e){tx.abort();reject(e)}})}
@@ -54,9 +92,34 @@ function validRecord(r){return r&&typeof r.id==='string'&&typeof r.fieldId==='st
 async function openDatabase(){return new Promise((resolve,reject)=>{const req=indexedDB.open('FieldScoutOfflineV7Test',1);req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains('notes'))d.createObjectStore('notes',{keyPath:'id'});if(!d.objectStoreNames.contains('settings'))d.createObjectStore('settings',{keyPath:'key'})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);req.onblocked=()=>reject(new Error('Close other Field Scout tabs and try again'))})}
 async function initialize(){try{db=await openDatabase();let old=[];try{old=JSON.parse(localStorage.getItem(key)||'[]')}catch{};if(Array.isArray(old)&&old.length){const existing=await getAll('notes');if(!existing.length){await transaction(['notes'],'readwrite',tx=>{for(const r of old){const x={...r,fieldId:String(r.fieldId||'').replace(/\s+/g,'')};if(validRecord(x)){x.id=String(x.id||crypto.randomUUID());tx.objectStore('notes').put(x)}}})}}records=(await getAll('notes')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt));const stored=await getSetting('plan');if(Array.isArray(stored))plan=stored.filter(id=>fields.some(f=>f[0]===id));else{try{const oldPlan=JSON.parse(localStorage.getItem(planKey)||'[]');if(Array.isArray(oldPlan))plan=oldPlan.map(id=>String(id).replace(/\s+/g,'')).filter(id=>fields.some(f=>f[0]===id));await transaction(['settings'],'readwrite',tx=>tx.objectStore('settings').put({key:'plan-'+cropYear,value:plan}))}catch{}}ready=true;setStatus('Saved on this iPad/browser');renderDashboard();if(current)renderHistory();try{if(navigator.storage?.persist){const persistent=await navigator.storage.persist();if(persistent)setStatus('Local storage protected*')}}catch{} }catch(e){setStatus('Storage unavailable');$('backupStatus').textContent='Storage error: '+e.message+' — do not enter scouting records.';console.error(e)}}
 
-function renderFields(){const q=$('search').value.toLowerCase().replace(/\s+/g,'').trim();$('fields').replaceChildren();yearFields().filter(f=>(f[0]+' '+f[1]+' '+f[3]).toLowerCase().replace(/\s+/g,'').includes(q)).forEach(f=>{const b=document.createElement('button');b.className='field'+(current===f[0]?' active':'');b.textContent=f[0]+' — '+f[1];const s=document.createElement('small');s.textContent=f[3]+' · '+f[2]+' acres · '+f[4];b.append(s);b.onclick=()=>selectField(f[0]);$('fields').append(b)});if(!$('fields').children.length)$('fields').textContent='No matching fields'}
-function selectField(id){showTab('scout');setFieldList(false);current=id;const f=yearFields().find(x=>x[0]===id);$('fieldTitle').textContent=f[0]+' — '+f[1];$('fieldMeta').textContent=cropYear+' field information · '+f[4];$('fieldYearPill').textContent=cropYear;$('stats').replaceChildren();[f[3],f[2]+' acres'].forEach(t=>{let x=document.createElement('span');x.textContent=t;$('stats').append(x)});$('detail').classList.remove('hide');$('placeholder').classList.add('hide');$('notes').value='';$('feedback').textContent='';renderFields();renderHistory();if(window.fieldScoutRefreshRecipe)window.fieldScoutRefreshRecipe()}
-function renderHistory(){const items=records.filter(r=>r.fieldId===current&&Number(r.cropYear||2026)===cropYear&&!r.deletedAt).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));const root=$('history');root.replaceChildren();root.style.maxHeight='440px';root.style.overflowY='auto';if(!items.length){root.textContent='No scouting notes saved for this field yet.';return}items.forEach(r=>{const d=document.createElement('div');d.className='entry';const m=document.createElement('div');m.className='muted';m.textContent=new Date(r.createdAt).toLocaleString()+(r.followup?' · Follow-up: '+r.followup:'');const t=document.createElement('div');t.textContent=r.text||(r.visitType==='schedule-only'?'No observations — next visit scheduled':'No observation recorded');const buttons=document.createElement('div');buttons.className='entry-actions';const edit=document.createElement('button');edit.className='mini';edit.textContent='Edit';edit.onclick=()=>editNote(r,d);const del=document.createElement('button');del.className='mini';del.textContent='Delete';del.onclick=()=>deleteNote(r);buttons.append(edit,del);d.append(m,t,buttons);root.append(d)})}
+function renderFields(){const q=$('search').value.toLowerCase().replace(/\s+/g,'').trim();$('fields').replaceChildren();yearFields().filter(f=>(f[0]+' '+f[1]+' '+f[3]).toLowerCase().replace(/\s+/g,'').includes(q)).forEach(f=>{const b=document.createElement('button');b.className='field'+(current===f[0]?' active':'');b.textContent=f[0]+' — '+f[1];const s=document.createElement('small');s.textContent=f[3]+' · '+fieldAcresLabel(f)+' · '+f[4];b.append(s);b.onclick=()=>selectField(f[0]);$('fields').append(b)});if(!$('fields').children.length)$('fields').textContent='No matching fields'}
+function selectField(id){
+ showTab('scout');setFieldList(false);current=id;
+ renderSelectedFieldHeader();
+ $('detail').classList.remove('hide');$('placeholder').classList.add('hide');
+ $('notes').value='';$('feedback').textContent='';
+ $('historyYearFilter').value='all';
+ renderFields();renderHistory();
+ if(window.fieldScoutRefreshRecipe)window.fieldScoutRefreshRecipe();
+}
+function renderHistory(){
+ const filter=$('historyYearFilter')?.value||'all';
+ const items=records.filter(r=>r.fieldId===current&&!r.deletedAt&&(filter==='all'||Number(r.cropYear||2026)===cropYear))
+ .sort((a,b)=>b.createdAt.localeCompare(a.createdAt)||b.id.localeCompare(a.id));
+ const root=$('history');root.replaceChildren();root.style.maxHeight='440px';root.style.overflowY='auto';
+ if(!items.length){root.textContent='No scouting notes saved for this field'+(filter==='all'?' in any crop year':' in '+cropYear)+'.';return}
+ items.forEach(r=>{
+  const d=document.createElement('div');d.className='entry';
+  const m=document.createElement('div');m.className='muted';
+  m.textContent='Crop year '+(r.cropYear||2026)+' · '+new Date(r.createdAt).toLocaleString()+(r.followup?' · Next visit originally: '+r.followup:'');
+  const t=document.createElement('div');t.textContent=r.text||(r.visitType==='schedule-only'?'No observations — next visit scheduled':'No observation recorded');
+  const buttons=document.createElement('div');buttons.className='entry-actions';
+  const edit=document.createElement('button');edit.className='mini';edit.textContent='Edit';edit.onclick=()=>editNote(r,d);
+  const del=document.createElement('button');del.className='mini';del.textContent='Delete';del.onclick=()=>deleteNote(r);
+  buttons.append(edit,del);d.append(m,t,buttons);root.append(d);
+ });
+}
+$('historyYearFilter').onchange=renderHistory;
 async function updateRecord(r,changes){const updated={...r,...changes,updatedAt:new Date().toISOString()};await transaction(['notes'],'readwrite',tx=>tx.objectStore('notes').put(updated));records=records.map(x=>x.id===r.id?updated:x);renderHistory();renderDashboard();setStatus('Saved locally')}
 function editNote(r,container){container.replaceChildren();const area=document.createElement('textarea');area.className='editarea';area.value=r.text;const label=document.createElement('label');label.textContent='Next visit date (leave blank for no follow-up)';const date=document.createElement('input');date.type='date';date.value=r.followup||'';const buttons=document.createElement('div');buttons.className='entry-actions';const save=document.createElement('button');save.className='mini primary';save.textContent='Save changes';const cancel=document.createElement('button');cancel.className='mini';cancel.textContent='Cancel';cancel.onclick=renderHistory;save.onclick=async()=>{save.disabled=true;try{await updateRecord(r,{text:area.value.trim(),followup:date.value,endYear:false,visitType:area.value.trim()?'observation':'schedule-only'})}catch(e){alert('Edit failed: '+e.message);save.disabled=false}};buttons.append(save,cancel);container.append(area,label,date,buttons)}
 async function deleteNote(r){if(!confirm('Permanently remove this scouting note from active history? A deletion marker will be retained for safe imports.'))return;try{await updateRecord(r,{deletedAt:new Date().toISOString(),followup:''})}catch(e){alert('Delete failed: '+e.message)}}
@@ -72,8 +135,9 @@ $('save').onclick=()=>{schedulingOnly=false;if(!current)return;if(!$('notes').va
 $('cancelVisit').onclick=closeVisit;
 $('visitModal').addEventListener('click',e=>{if(e.target===$('visitModal'))closeVisit()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeVisit()});
-async function commitNote(choice){if(!current||saving)return;if(!ready){$('visitError').textContent='Storage is not ready. Do not close this page.';return}const text=$('notes').value.trim();if(!text&&!schedulingOnly){closeVisit();$('feedback').textContent='Enter a scouting observation first.';return}let followup='';if(choice!=='none'&&choice!=='end'){const days=Number(choice);if(!Number.isInteger(days)||days<1||days>365){$('visitError').textContent='Enter a number of days between 1 and 365.';return}followup=visitDate(days)}const r={id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random(),fieldId:current,cropYear,createdAt:new Date().toISOString(),text:schedulingOnly?'':text,visitType:schedulingOnly?'schedule-only':'observation',followup,endYear:choice==='end'};const nearby=visibleRecords().filter(x=>x.fieldId===current&&x.followup&&followup&&Math.abs((new Date(x.followup+'T12:00:00')-new Date(followup+'T12:00:00'))/86400000)<=5);
-if(nearby.length){const dates=[...new Set([...nearby.map(x=>x.followup),followup])].sort();$('overlapText').textContent='Existing '+nearby.map(x=>x.followup).join(', ')+'; proposed '+followup+'. Choose one date, or keep both.';$('overlapDate').replaceChildren();for(const d of dates){const o=document.createElement('option');o.value=d;o.textContent=d;$('overlapDate').append(o)}$('overlapDate').value=followup;closeVisit();$('overlapModal').classList.remove('hide');const choice=await new Promise(resolve=>{ $('combineVisits').onclick=()=>resolve($('overlapDate').value);$('keepVisits').onclick=()=>resolve('both');$('cancelOverlap').onclick=()=>resolve(null)});$('overlapModal').classList.add('hide');if(choice===null)return;if(choice!=='both'){r.followup=choice;const now=new Date().toISOString();const changed=nearby.map(x=>({...x,followup:'',updatedAt:now,combinedInto:r.id,originalFollowup:x.originalFollowup||x.followup}));try{await transaction(['notes'],'readwrite',tx=>{for(const x of changed)tx.objectStore('notes').put(x)});records=records.map(x=>changed.find(z=>z.id===x.id)||x)}catch(e){alert('Could not combine visits: '+e.message);return}}}
+async function commitNote(choice){if(!current||saving)return;if(!ready){$('visitError').textContent='Storage is not ready. Do not close this page.';return}const text=$('notes').value.trim();if(!text&&!schedulingOnly){closeVisit();$('feedback').textContent='Enter a scouting observation first.';return}let followup='';if(choice!=='none'&&choice!=='end'){const days=Number(choice);if(!Number.isInteger(days)||days<1||days>365){$('visitError').textContent='Enter a number of days between 1 and 365.';return}followup=visitDate(days)}const selected=yearFields().find(f=>f[0]===current);
+const r={id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random(),fieldId:current,cropYear,createdAt:new Date().toISOString(),text:schedulingOnly?'':text,visitType:schedulingOnly?'schedule-only':'observation',followup,endYear:choice==='end',fieldSnapshot:selected?{name:selected[1],crop:selected[3],acres:selected[2],operator:selected[4]}:null};
+// This new visit is the only current follow-up; earlier visit dates remain historical.
 const nextPlan=plan.filter(id=>id!==current);saving=true;$('visitError').textContent='Saving…';try{await transaction(['notes','settings'],'readwrite',tx=>{tx.objectStore('notes').add(r);tx.objectStore('settings').put({key:'plan-'+cropYear,value:nextPlan})});records.push(r);plan=nextPlan;$('notes').value='';schedulingOnly=false;closeVisit();$('feedback').textContent='Saved in the local database. Back up your data regularly.';renderHistory();renderDashboard();setStatus('Saved locally');if(window.v705ReturnAfterSave)window.v705ReturnAfterSave();else showTab('home')}catch(e){$('visitError').textContent='Save failed; your note is still on screen: '+e.message}finally{saving=false}}
 document.querySelectorAll('[data-visit]').forEach(b=>b.onclick=()=>commitNote(b.dataset.visit));
 $('saveCustom').onclick=()=>commitNote($('customDays').value);
@@ -87,12 +151,12 @@ const completedToday=id=>visibleRecords().some(r=>r.fieldId===id&&localDate(r.cr
 async function savePlan(){if(!ready){$('planFeedback').textContent='Storage is not ready';return}try{await transaction(['settings'],'readwrite',tx=>tx.objectStore('settings').put({key:'plan-'+cropYear,value:plan}));$('planFeedback').textContent='Plan saved in this device.';setStatus('Saved locally')}catch(e){$('planFeedback').textContent='Could not save plan: '+e.message;const stored=await getSetting('plan-'+cropYear);plan=Array.isArray(stored)?stored:[]}renderDashboard()}
 function showTab(tab){$('homeView').classList.toggle('hide',tab!=='home');$('scoutView').classList.toggle('hide',tab!=='scout');$('planningView').classList.toggle('hide',tab!=='planning');$('homeTab').classList.toggle('selected',tab==='home');$('scoutTab').classList.toggle('selected',tab==='scout');$('planningTab').classList.toggle('selected',tab==='planning');if(tab==='home')renderDashboard();window.scrollTo(0,0)}
 $('homeTab').onclick=()=>showTab('home');$('scoutTab').onclick=()=>{showTab('scout');setFieldList(true)};$('planningTab').onclick=()=>showTab('planning');$('backToHome').onclick=()=>showTab('home');
-const crops=[...new Set(fields.map(f=>f[3]))].sort();for(const crop of crops){const o=document.createElement('option');o.value=crop;o.textContent=crop;$('cropFilter').append(o)}
-function makeRow(f,action,label,status,clickableName=false){const row=document.createElement('div');row.className='planrow';const left=document.createElement('div');const name=document.createElement(clickableName?'button':'div');name.className='fieldname'+(clickableName?' fieldname-link':'');name.textContent=f[0]+' — '+f[1];if(clickableName){name.type='button';name.setAttribute('aria-label','Open scouting history for '+f[0]+' — '+f[1]);name.onclick=()=>selectField(f[0])}const meta=document.createElement('small');meta.textContent=f[3]+' · '+f[2]+' acres'+(status?' · '+status:'');left.append(name,meta);const actions=document.createElement('div');actions.style.display='flex';actions.style.gap='6px';const open=document.createElement('button');open.className='mini primary';open.textContent='Scout';open.onclick=()=>selectField(f[0]);actions.append(open);if(action){const btn=document.createElement('button');btn.className='mini';btn.textContent=label;btn.onclick=action;actions.append(btn)}row.append(left,actions);return row}
-function renderDashboard(){const day=today();$('planDate').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});const done=yearFields().filter(f=>completedToday(f[0])).map(f=>f[0]),remaining=plan.filter(id=>!completedToday(id));const due=yearFields().filter(f=>{const r=latest(f[0]);return r&&r.followup&&r.followup<=day&&!r.endYear&&!completedToday(f[0])});$('countPlanned').textContent=remaining.length;$('countCompleted').textContent=done.length;$('countDue').textContent=due.length;
-const planned=$('plannedFields');planned.replaceChildren();if(!remaining.length){const p=document.createElement('p');p.className='empty';p.textContent='No fields remaining. Use the Planning tab to add fields.';planned.append(p)}for(const farmer of ['HT','JF','JP','JR']){const ff=remaining.map(id=>yearFields().find(f=>f[0]===id)).filter(f=>f&&f[4]===farmer);if(!ff.length)continue;const group=document.createElement('h3');group.textContent=farmerNames[farmer]+' ('+ff.length+')';planned.append(group);for(const crop of crops){const subset=ff.filter(f=>f[3]===crop);if(!subset.length)continue;const h=document.createElement('div');h.className='muted';h.textContent=crop+' ('+subset.length+')';planned.append(h);subset.sort((a,b)=>a[0].localeCompare(b[0],undefined,{numeric:true})).forEach(f=>planned.append(makeRow(f,()=>{plan=plan.filter(id=>id!==f[0]);savePlan()},'Remove')))}}
+const crops=[...new Set(fields.map(f=>f[3]))].sort();for(const crop of [...crops,UNCONFIRMED_CROP]){const o=document.createElement('option');o.value=crop;o.textContent=crop;$('cropFilter').append(o)}
+function makeRow(f,action,label,status,clickableName=false){const row=document.createElement('div');row.className='planrow';const left=document.createElement('div');const name=document.createElement(clickableName?'button':'div');name.className='fieldname'+(clickableName?' fieldname-link':'');name.textContent=f[0]+' — '+f[1];if(clickableName){name.type='button';name.setAttribute('aria-label','Open scouting history for '+f[0]+' — '+f[1]);name.onclick=()=>selectField(f[0])}const meta=document.createElement('small');meta.textContent=f[3]+' · '+fieldAcresLabel(f)+(status?' · '+status:'');left.append(name,meta);const actions=document.createElement('div');actions.style.display='flex';actions.style.gap='6px';const open=document.createElement('button');open.className='mini primary';open.textContent='Scout';open.onclick=()=>selectField(f[0]);actions.append(open);if(action){const btn=document.createElement('button');btn.className='mini';btn.textContent=label;btn.onclick=action;actions.append(btn)}row.append(left,actions);return row}
+function renderDashboard(){const day=today();$('planDate').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});const done=yearFields().filter(f=>completedToday(f[0])).map(f=>f[0]),remaining=plan.filter(id=>!completedToday(id));const due=yearFields().filter(f=>{const d=effectiveFollowup(f[0]);return d&&d<=day&&!completedToday(f[0])});$('countPlanned').textContent=remaining.length;$('countCompleted').textContent=done.length;$('countDue').textContent=due.length;
+const planned=$('plannedFields');planned.replaceChildren();if(!remaining.length){const p=document.createElement('p');p.className='empty';p.textContent='No fields remaining. Use the Planning tab to add fields.';planned.append(p)}for(const farmer of ['HT','JF','JP','JR']){const ff=remaining.map(id=>yearFields().find(f=>f[0]===id)).filter(f=>f&&f[4]===farmer);if(!ff.length)continue;const group=document.createElement('h3');group.textContent=farmerNames[farmer]+' ('+ff.length+')';planned.append(group);for(const crop of [...crops,UNCONFIRMED_CROP]){const subset=ff.filter(f=>f[3]===crop);if(!subset.length)continue;const h=document.createElement('div');h.className='muted';h.textContent=crop+' ('+subset.length+')';planned.append(h);subset.sort((a,b)=>a[0].localeCompare(b[0],undefined,{numeric:true})).forEach(f=>planned.append(makeRow(f,()=>{plan=plan.filter(id=>id!==f[0]);savePlan()},'Remove')))}}
 const completed=$('completedFields');completed.replaceChildren();if(!done.length){completed.textContent='No fields completed today yet.';completed.className='empty'}else{completed.className='';done.forEach(id=>{const f=yearFields().find(f=>f[0]===id);if(f)completed.append(makeRow(f,null,'','✓ Scouted today',true))})}
-const dueBox=$('dueFields');dueBox.replaceChildren();if(!due.length){dueBox.textContent='No follow-ups due based on saved notes.';dueBox.className='empty'}else{dueBox.className='';due.sort((a,b)=>latest(a[0]).followup.localeCompare(latest(b[0]).followup));due.forEach(f=>dueBox.append(makeRow(f,plan.includes(f[0])?null:()=>{plan.push(f[0]);savePlan()},'Add', 'Due '+latest(f[0]).followup)))}renderUpcoming();renderAddFields()}
+const dueBox=$('dueFields');dueBox.replaceChildren();if(!due.length){dueBox.textContent='No follow-ups due based on saved notes.';dueBox.className='empty'}else{dueBox.className='';due.sort((a,b)=>effectiveFollowup(a[0]).localeCompare(effectiveFollowup(b[0])));due.forEach(f=>dueBox.append(makeRow(f,plan.includes(f[0])?null:()=>{plan.push(f[0]);savePlan()},'Add', 'Due '+effectiveFollowup(f[0]))))}renderUpcoming();renderAddFields()}
 function renderUpcoming(){const root=$('upcomingFields');root.replaceChildren();const start=today(),end=visitDate(7);const visits=yearFields().filter(f=>{const d=effectiveFollowup(f[0]);return d&&d>start&&d<=end&&!completedToday(f[0])}).sort((a,b)=>effectiveFollowup(a[0]).localeCompare(effectiveFollowup(b[0])));if(!visits.length){root.textContent='No visits scheduled in the next 7 days.';root.className='empty';return}root.className='';let day='';for(const f of visits){const d=effectiveFollowup(f[0]);if(d!==day){day=d;const h=document.createElement('h3');h.className='upcoming-day';h.textContent=new Date(d+'T12:00:00').toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'});root.append(h)}root.append(makeRow(f,plan.includes(f[0])?null:()=>{plan.push(f[0]);savePlan()},'Add to plan','Scheduled '+d,true))}}
 function renderAddFields(){const crop=$('cropFilter').value,farmer=$('farmerFilter').value,q=$('planSearch').value.toLowerCase().replace(/\s+/g,'');const list=$('addFields');list.replaceChildren();const visible=yearFields().filter(f=>(!farmer||f[4]===farmer)&&(!crop||f[3]===crop)&&(f[0]+' '+f[1]).toLowerCase().replace(/\s+/g,'').includes(q));let lastFarmer='';for(const f of visible){if(f[4]!==lastFarmer){lastFarmer=f[4];const heading=document.createElement('div');heading.className='field-group';heading.textContent=farmerNames[lastFarmer]||lastFarmer;list.append(heading)}const l=document.createElement('label');l.className='checkrow';const input=document.createElement('input');input.type='checkbox';input.checked=pendingSelection.has(f[0]);input.onchange=()=>{if(input.checked)pendingSelection.add(f[0]);else pendingSelection.delete(f[0])};const name=document.createElement('span');name.textContent=f[0]+' — '+f[1];const small=document.createElement('small');small.textContent=plan.includes(f[0])?'In plan':f[3];l.append(input,name,small);list.append(l)}if(!visible.length)list.textContent='No matching fields.'}
 $('jumpCompleted').onclick=()=>{$('completedSection').scrollIntoView({behavior:'smooth',block:'start'});};
@@ -100,77 +164,112 @@ $('farmerFilter').onchange=renderAddFields;$('cropFilter').onchange=renderAddFie
 $('selectVisible').onclick=()=>{const crop=$('cropFilter').value,farmer=$('farmerFilter').value,q=$('planSearch').value.toLowerCase().replace(/\s+/g,'');yearFields().filter(f=>(!farmer||f[4]===farmer)&&(!crop||f[3]===crop)&&(f[0]+' '+f[1]).toLowerCase().replace(/\s+/g,'').includes(q)).forEach(f=>pendingSelection.add(f[0]));renderAddFields()};
 $('clearSelection').onclick=()=>{pendingSelection.clear();renderAddFields()};
 $('addToPlan').onclick=()=>{if(!pendingSelection.size){$('planFeedback').textContent='Select one or more fields first.';return}for(const id of pendingSelection)if(!plan.includes(id))plan.push(id);pendingSelection.clear();savePlan();$('planFeedback').textContent='Fields added to your plan. Return to Scouting Plan to scout them.'};
-$('cropYear').onchange=async()=>{cropYear=Number($('cropYear').value);await transaction(['settings'],'readwrite',tx=>tx.objectStore('settings').put({key:'cropYear',value:cropYear}));plan=[];const saved=await getSetting('plan-'+cropYear);if(Array.isArray(saved))plan=saved;pendingSelection.clear();if(current)selectField(current);renderDashboard()};
+$('cropYear').onchange=async()=>{
+ const nextYear=Number($('cropYear').value);
+ if($('notes').value.trim()&&!confirm('Changing crop years will discard the unsaved scouting note. Continue?')){$('cropYear').value=String(cropYear);return}
+ cropYear=nextYear;
+ await transaction(['settings'],'readwrite',tx=>tx.objectStore('settings').put({key:'cropYear',value:cropYear}));
+ const saved=await getSetting('plan-'+cropYear);plan=Array.isArray(saved)?saved:[];
+ pendingSelection.clear();if(current)selectField(current);renderDashboard();renderYearReview();
+};
 const annualEditor=document.createElement('dialog');
 annualEditor.id='annualEditor';annualEditor.style.cssText='border:1px solid #cbd9cc;border-radius:14px;padding:22px;width:min(420px,calc(100vw - 32px));box-shadow:0 15px 60px #0003;color:#193b29;background:white';
 annualEditor.innerHTML=`<form id="annualEditorForm" style="display:grid;gap:12px">
 <h3 style="margin:0">Edit Field Info</h3>
 <div id="annualEditorField" style="color:#50675a"></div>
-<p class="muted" style="margin:0">Crop and acres change for the selected year only. Field name and farmer are shared across all years. Existing scouting notes stay linked to the same Field ID.</p>
+<p class="muted" style="margin:0">Crop and acreage apply only to the selected year. For field name and farmer changes, choose whether it is a correction for all years or a change starting this year.</p>
 <label>Field name<input id="annualEditorName" required maxlength="120"></label>
 <label>Farmer / operator<select id="annualEditorOperator" required></select></label>
+<label>Name/farmer scope<select id="annualEditorScope"><option value="from-year">Change starting in this crop year</option><option value="all-years">Correct a mistake in all years</option></select></label>
 <label>Crop for selected year<select id="annualEditorCrop" required></select></label>
 <label>Acres for selected year<input id="annualEditorAcres" type="number" min="0.01" max="100000" step="any" required></label>
+<p id="annualEditorSuggestion" class="muted" style="margin:0"></p>
 <label style="display:flex;align-items:flex-start;gap:9px;font-weight:600"><input type="checkbox" id="annualEditorConfirm" required style="width:20px;margin-top:5px;flex-shrink:0"><span id="annualEditorConfirmText"></span></label>
 <div id="annualEditorError" role="alert" style="color:#a12424"></div>
 <div class="actions"><button type="button" id="annualEditorCancel">Cancel</button><button type="submit" class="primary">Review changes</button></div></form>`;
 document.body.append(annualEditor);
 $('annualEditorCancel').onclick=()=>annualEditor.close();
-let editingField=null,editingYear=null;
-$('editAnnual').onclick=()=>{
- if(!current){$('annualStatus').textContent='Choose a field under Fields / Notes first.';showTab('scout');setFieldList(true);return}
- const f=yearFields().find(x=>x[0]===current);if(!f)return;
- editingField=current;editingYear=cropYear;
+let editingField=null,editingYear=null,editingInitialAnnual=null,editingInitialIdentity=null;
+function openFieldEditor(fieldId){
+ const base=fields.find(f=>f[0]===fieldId);if(!base)return;
+ const f=yearFields().find(x=>x[0]===fieldId);if(!f)return;
+ editingField=fieldId;editingYear=cropYear;
+ editingInitialAnnual=JSON.stringify(annual[editingYear+'|'+editingField]??null);
+ editingInitialIdentity=JSON.stringify(identityForYear(base,editingYear));
  $('annualEditorField').textContent=f[0]+' — '+f[1]+' · '+editingYear;
  $('annualEditorName').value=f[1];
  $('annualEditorOperator').replaceChildren();
  for(const [code,name] of Object.entries(farmerNames)){const o=document.createElement('option');o.value=code;o.textContent=name+' ('+code+')';$('annualEditorOperator').append(o)}
- $('annualEditorOperator').value=f[4];
+ $('annualEditorOperator').value=f[4];$('annualEditorScope').value='from-year';
  $('annualEditorCrop').replaceChildren();
  for(const c of crops){const o=document.createElement('option');o.value=c;o.textContent=c;$('annualEditorCrop').append(o)}
- $('annualEditorCrop').value=f[3];$('annualEditorAcres').value=f[2];
+ const suggested=suggestedAnnual(base,editingYear);
+ $('annualEditorCrop').value=f[3]===UNCONFIRMED_CROP?suggested.crop:f[3];
+ $('annualEditorAcres').value=f[2]??suggested.acres;
+ $('annualEditorSuggestion').textContent=fieldYearConfirmed(fieldId)?'This crop year is confirmed.':'Not confirmed for '+editingYear+'. Starting values are suggestions from an earlier year; review them carefully.';
  $('annualEditorError').textContent='';$('annualEditorConfirm').checked=false;
- $('annualEditorConfirmText').textContent='I understand crop/acres apply to '+editingYear+' only; field name/farmer apply to all years.';
+ $('annualEditorConfirmText').textContent='I confirm the crop and acres for '+editingYear+'. Name/farmer changes use the selected scope.';
  annualEditor.showModal();
+}
+$('editAnnual').onclick=()=>{
+ if(!current){$('annualStatus').textContent='Choose a field under Fields / Notes first.';showTab('scout');setFieldList(true);return}
+ openFieldEditor(current);
 };
 $('annualEditorForm').onsubmit=async e=>{
  e.preventDefault();
- if(!editingField||editingYear!==cropYear||editingField!==current){$('annualEditorError').textContent='The selected field or crop year changed. Close and reopen the editor.';return}
- const f=yearFields().find(x=>x[0]===editingField);
- const base=fields.find(x=>x[0]===editingField);
+ if(!editingField||editingYear!==cropYear){$('annualEditorError').textContent='The crop year changed. Reopen the editor.';return}
+ const f=yearFields().find(x=>x[0]===editingField),base=fields.find(x=>x[0]===editingField);
  if(!f||!base)return;
- const name=$('annualEditorName').value.trim(),operator=$('annualEditorOperator').value,crop=$('annualEditorCrop').value,acres=Number($('annualEditorAcres').value);
+ if(editingInitialAnnual!==JSON.stringify(annual[editingYear+'|'+editingField]??null)||editingInitialIdentity!==JSON.stringify(identityForYear(base,editingYear))){$('annualEditorError').textContent='This field changed since the editor opened. Close and reopen to avoid overwriting new information.';return}
+ const name=$('annualEditorName').value.trim(),operator=$('annualEditorOperator').value,crop=$('annualEditorCrop').value,acres=Number($('annualEditorAcres').value),scope=$('annualEditorScope').value;
  if(!name||name.length>120||!Object.hasOwn(farmerNames,operator)||!crops.includes(crop)||!Number.isFinite(acres)||acres<=0||acres>100000){$('annualEditorError').textContent='Check the name, farmer, crop, and acres.';return}
- if(!$('annualEditorConfirm').checked){$('annualEditorError').textContent='Please confirm the change scope.';return}
+ if(!$('annualEditorConfirm').checked){$('annualEditorError').textContent='Confirm the crop year before saving.';return}
+ if(scope==='all-years'&&Object.keys(fieldIdentityHistory).some(k=>k.endsWith('|'+editingField))){$('annualEditorError').textContent='This field already has dated name/farmer changes. Edit the affected years individually instead of overriding their history.';return}
  const changes=[];
- if(f[1]!==name)changes.push('Field name (all years): '+f[1]+' → '+name);
- if(f[4]!==operator)changes.push('Farmer (all years): '+farmerNames[f[4]]+' → '+farmerNames[operator]);
+ if(f[1]!==name)changes.push('Field name ('+(scope==='all-years'?'correct all years':'starting '+editingYear)+'): '+f[1]+' → '+name);
+ if(f[4]!==operator)changes.push('Farmer ('+(scope==='all-years'?'correct all years':'starting '+editingYear)+'): '+farmerNames[f[4]]+' → '+farmerNames[operator]);
  if(f[3]!==crop)changes.push(editingYear+' crop: '+f[3]+' → '+crop);
- if(Number(f[2])!==acres)changes.push(editingYear+' acres: '+f[2]+' → '+acres);
+ if(f[2]!==acres)changes.push(editingYear+' acres: '+fieldAcresLabel(f)+' → '+acres+' acres');
+ if(!fieldYearConfirmed(editingField))changes.push('Confirm '+editingYear+' annual field information');
  if(!changes.length){annualEditor.close();return}
- if(!confirm('Review changes to '+editingField+':\\n\\n'+changes.join('\\n')+'\\n\\nSave these changes?'))return;
+ if(!confirm('Review changes to '+editingField+':\n\n'+changes.join('\n')+'\n\nSave these changes?'))return;
  const annualKey=editingYear+'|'+editingField;
- const nextAnnual={...annual,[annualKey]:{crop,acres}};
- const nextIdentity={...fieldIdentity,[editingField]:{name,operator}};
+ const nextAnnual={...annual,[annualKey]:{crop,acres,confirmed:true,updatedAt:new Date().toISOString()}};
+ let nextIdentity=fieldIdentity,nextIdentityHistory=fieldIdentityHistory;
+ if(name!==f[1]||operator!==f[4]){
+  if(scope==='all-years')nextIdentity={...fieldIdentity,[editingField]:{name,operator}};
+  else nextIdentityHistory={...fieldIdentityHistory,[annualKey]:{name,operator}};
+ }
  try{
   await transaction(['settings'],'readwrite',tx=>{
-   const st=tx.objectStore('settings');
-   st.put({key:'annual',value:nextAnnual});
+   const st=tx.objectStore('settings');st.put({key:'annual',value:nextAnnual});
    st.put({key:'field-identity-v1',value:nextIdentity});
+   st.put({key:'field-identity-history-v1',value:nextIdentityHistory});
   });
-  annual=nextAnnual;fieldIdentity=nextIdentity;
+  annual=nextAnnual;fieldIdentity=nextIdentity;fieldIdentityHistory=nextIdentityHistory;
   annualEditor.close();
-  // Refresh field labels without clearing an unsaved scouting observation.
-  const updated=yearFields().find(x=>x[0]===current);
-  $('fieldTitle').textContent=updated[0]+' — '+updated[1];
-  $('fieldMeta').textContent=cropYear+' field information · '+updated[4];
-  $('stats').replaceChildren();
-  for(const text of [updated[3],updated[2]+' acres']){const span=document.createElement('span');span.textContent=text;$('stats').append(span)}
-  renderFields();renderDashboard();
+  if(current===editingField)renderSelectedFieldHeader();
+  renderFields();renderDashboard();renderYearReview();
   if(window.fieldScoutRefreshRecipe)window.fieldScoutRefreshRecipe();
-  $('annualStatus').textContent='Field information saved.';
+  $('annualStatus').textContent='Field information confirmed and saved for '+editingYear+'.';
  }catch(err){$('annualEditorError').textContent='Could not save: '+err.message}
 };
+function renderYearReview(){
+ const status=$('yearReviewStatus'),list=$('yearReviewFields');if(!status||!list)return;
+ const all=yearFields(),confirmed=all.filter(f=>fieldYearConfirmed(f[0])).length;
+ status.textContent=cropYear+': '+confirmed+' / '+all.length+' fields confirmed.';
+ $('yearConfirmationStatus').textContent=confirmed===all.length?cropYear+' fields confirmed':(all.length-confirmed)+' fields need '+cropYear+' crop/acre confirmation';
+ list.replaceChildren();let farmer='';
+ for(const f of all.slice().sort((a,b)=>a[4].localeCompare(b[4])||a[0].localeCompare(b[0],undefined,{numeric:true}))){
+  if(f[4]!==farmer){farmer=f[4];const h=document.createElement('div');h.className='field-group';h.textContent=farmerNames[farmer]||farmer;list.append(h)}
+  const row=document.createElement('div');row.className='planrow';
+  const info=document.createElement('div');info.style.minWidth='0';
+  const name=document.createElement('strong');name.textContent=f[0]+' — '+f[1];
+  const detail=document.createElement('small');detail.textContent=fieldYearConfirmed(f[0])?f[3]+' · '+fieldAcresLabel(f):'NOT CONFIRMED — set crop & acres';
+  const btn=document.createElement('button');btn.type='button';btn.className='mini';btn.textContent=fieldYearConfirmed(f[0])?'Edit':'Confirm';btn.onclick=()=>openFieldEditor(f[0]);
+  info.append(name,detail);row.append(info,btn);list.append(row);
+ }
+}
 function downloadJson(data,name){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}
 function backupPayload(all,p){return {format:'FieldScoutBackup',version:3,selectedCropYear:cropYear,annual,exportedAt:new Date().toISOString(),sourceDevice:'manual-export',fields:yearFields().map(f=>({fieldId:f[0],name:f[1],acres:f[2],crop:f[3],operator:f[4],cropYear})),records:all,plan:Array.isArray(p)?p:[]}}
 function parseBackup(data){if(data?.format!=='FieldScoutBackup'||![1,2,3].includes(data.version)||!Array.isArray(data.records)||!Array.isArray(data.plan))throw Error('Not a supported Field Scout backup');if(data.records.length>100000||!data.records.every(validRecord)||!data.plan.every(id=>typeof id==='string'&&fields.some(f=>f[0]===id)))throw Error('Backup contains invalid records');if(data.version>=2&&(!Array.isArray(data.fields)||data.fields.length>10000||!data.fields.every(f=>f&&typeof f.fieldId==='string'&&typeof f.name==='string')))throw Error('Field list in backup is invalid');return data}
@@ -179,7 +278,16 @@ $('backupAll').onclick=async()=>{if(!ready){$('backupStatus').textContent='Stora
 $('importFile').onchange=async e=>{const file=e.target.files?.[0];if(!file||!ready)return;try{if(file.size>20*1024*1024)throw Error('Backup is too large');const data=parseBackup(JSON.parse(await file.text()));const existing=await getAll('notes'),known=new Map(existing.map(r=>[r.id,r]));const additions=[],updates=[];let unchanged=0,older=0,conflicts=0;for(const r of data.records){const old=known.get(r.id);if(!old){additions.push(r);continue}if(JSON.stringify(old)===JSON.stringify(r)){unchanged++;continue}const oldTime=old.updatedAt||old.deletedAt||old.createdAt,newTime=r.updatedAt||r.deletedAt||r.createdAt;if(newTime>oldTime)updates.push(r);else if(newTime<oldTime)older++;else conflicts++}if(conflicts){$('backupStatus').textContent='Import stopped: '+conflicts+' conflicting records with equal revision timestamps. No changes made.';return}if(!additions.length&&!updates.length){$('backupStatus').textContent='0 new notes imported. '+unchanged+' already present; '+older+' older copies ignored. No duplicates created.';alert($('backupStatus').textContent);return}if(!confirm('Import '+additions.length+' new notes and '+updates.length+' newer edits/deletions? Existing plan will remain unchanged.'))return;await transaction(['notes'],'readwrite',tx=>{for(const r of [...additions,...updates])tx.objectStore('notes').put(r)});records=await getAll('notes');renderDashboard();if(current)renderHistory();$('backupStatus').textContent='Imported '+additions.length+' new notes and '+updates.length+' updated records; '+unchanged+' unchanged, '+older+' older ignored. Plan unchanged.';alert($('backupStatus').textContent)}catch(err){$('backupStatus').textContent='Import failed: '+err.message;alert($('backupStatus').textContent)}finally{e.target.value=''}};
 showLastBackup();
 $('restoreFile').onchange=async e=>{const file=e.target.files?.[0];if(!file||!ready)return;try{if(file.size>20*1024*1024)throw Error('Backup is too large');const data=JSON.parse(await file.text());parseBackup(data);if(!confirm('Restore backup? Matching note IDs will be overwritten and your current daily plan replaced. Use Import scouting notes for non-destructive desktop transfers. Back up first.'))return;await transaction(['notes','settings'],'readwrite',tx=>{for(const r of data.records)tx.objectStore('notes').put(r);tx.objectStore('settings').put({key:'plan-'+(data.selectedCropYear||2026),value:data.plan});if(data.version===3&&data.annual)tx.objectStore('settings').put({key:'annual',value:data.annual})});records=await getAll('notes');if((data.selectedCropYear||2026)===cropYear)plan=data.plan.slice();if(data.version===3&&data.annual)annual=data.annual;renderDashboard();if(current)renderHistory();$('backupStatus').textContent='Backup restored: '+data.records.length+' notes in file.'}catch(err){$('backupStatus').textContent='Restore failed: '+err.message}finally{e.target.value=''}};
-renderDashboard();initialize().then(async()=>{const y=await getSetting('cropYear');if(Number.isInteger(y)&&y>=2026&&y<=2030)cropYear=y;annual=await getSetting('annual')||{};fieldIdentity=await getSetting('field-identity-v1')||{};$('cropYear').value=String(cropYear);const p=await getSetting('plan-'+cropYear);if(Array.isArray(p))plan=p;else if(cropYear!==2026)plan=[];renderDashboard();if(current)selectField(current)});
+renderDashboard();initialize().then(async()=>{if(!ready)return;const y=await getSetting('cropYear');if(Number.isInteger(y)&&y>=2026&&y<=2030)cropYear=y;annual=await getSetting('annual')||{};fieldIdentity=await getSetting('field-identity-v1')||{};fieldIdentityHistory=await getSetting('field-identity-history-v1')||{};$('cropYear').value=String(cropYear);const p=await getSetting('plan-'+cropYear);if(Array.isArray(p))plan=p;else if(cropYear!==2026)plan=[];renderDashboard();renderYearReview();if(current)renderSelectedFieldHeader()});
+window.fieldScoutRefreshStoredSettings=async(changedKeys=[])=>{
+ if(!ready)return;
+ if(changedKeys.includes('annual'))annual=await getSetting('annual')||{};
+ if(changedKeys.includes('field-identity-v1'))fieldIdentity=await getSetting('field-identity-v1')||{};
+ if(changedKeys.includes('field-identity-history-v1'))fieldIdentityHistory=await getSetting('field-identity-history-v1')||{};
+ if(changedKeys.includes('plan-'+cropYear)){const p=await getSetting('plan-'+cropYear);plan=Array.isArray(p)?p:[]}
+ renderSelectedFieldHeader();renderFields();renderDashboard();renderYearReview();
+ if(window.fieldScoutRefreshRecipe)window.fieldScoutRefreshRecipe();
+};
 if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('Offline installation unavailable',e));
 </script><script>
 /* Field Scout Spray Orders — standalone extension to existing v5.5 data model */
@@ -199,7 +307,7 @@ const fieldKey=id=>year()+'|'+id;
 const getRecipe=id=>recipes.find(r=>r.id===id);
 const getField=id=>yearFields().find(f=>f[0]===id);
 const farmerOptions=()=>Object.entries(farmerNames).map(([id,name])=>`<option value="${esc(id)}">${esc(name)}</option>`).join('');
-const cropOptions=()=>[...new Set(yearFields().map(f=>f[3]))].sort().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+const cropOptions=()=>[...new Set(yearFields().filter(f=>fieldYearConfirmed(f[0])).map(f=>f[3]))].sort().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
 const opt=(arr,value)=>arr.map(v=>`<option value="${esc(v)}" ${v===value?'selected':''}>${esc(v)}</option>`).join('');
 const qtyBase=(rate,unit,gpa,acres)=>{const [unitName,denom]=unit.split('/');const v=Number(rate)*Number(acres)*(denom==='100 gal'?Number(gpa)/100:1);const factors={'fl oz':1,'pt':16,'qt':32,'gal':128,'oz wt':1,'lb':16};return {amount:v*factors[unitName],kind:unitName==='oz wt'||unitName==='lb'?'weight':'volume'}};
 const packBase=(size,unit)=>size*({'fl oz':1,'pt':16,'qt':32,'gal':128,'oz wt':1,'lb':16}[unit]||1);
@@ -212,7 +320,7 @@ function recipeEdit(id){const r=getRecipe(id);if(!r)return;editId=r.id;S('sprayR
 function setMessage(msg){S('sprayStatus').textContent=msg}
 function renderGroup(){const farmer=S('sprayFarmer').value,crop=S('sprayCrop').value,fs=yearFields().filter(f=>f[4]===farmer&&f[3]===crop),applicable=recipes.filter(r=>!r.crop||r.crop===crop),defaultId=assignments[groupKey(farmer,crop)]||'';S('sprayGroupInfo').textContent=`${fs.length} fields · ${fmt(fs.reduce((n,f)=>n+Number(f[2]),0))} acres · crop year ${year()}`;S('sprayDefaultRecipe').innerHTML='<option value="">No default recipe</option>'+applicable.map(r=>`<option value="${esc(r.id)}" ${defaultId===r.id?'selected':''}>${esc(r.name)}</option>`).join('');S('sprayAssignments').innerHTML=fs.map(f=>{const override=assignments[fieldKey(f[0])];const val=override===undefined?'inherit':override;return `<div class="spray-assignment"><div><strong>${esc(f[0])} — ${esc(f[1])}</strong><div class="muted">${fmt(f[2])} acres</div></div><select data-fieldassignment="${esc(f[0])}"><option value="inherit" ${val==='inherit'?'selected':''}>Use crop default</option><option value="" ${val===''?'selected':''}>Do not spray</option>${applicable.map(r=>`<option value="${esc(r.id)}" ${val===r.id?'selected':''}>${esc(r.name)}</option>`).join('')}</select></div>`}).join('')||'<p class="muted">No fields match this farmer and crop.</p>';renderPreview()}
 function resolveRecipe(f){const over=assignments[fieldKey(f[0])];return over===undefined?assignments[groupKey(f[4],f[3])]||'':over}
-function calculate(){const farmer=S('sprayFarmer').value,crop=S('sprayCrop').value;const fs=yearFields().filter(f=>f[4]===farmer&&f[3]===crop);const groups=new Map(),totals=new Map(),warnings=[];for(const f of fs){const r=getRecipe(resolveRecipe(f));if(!r)continue;if(r.crop&&r.crop!==f[3]){warnings.push(f[0]+': recipe crop mismatch');continue}if(!groups.has(r.id))groups.set(r.id,{recipe:structuredClone(r),fields:[],products:new Map(),acres:0});const g=groups.get(r.id);g.fields.push({id:f[0],name:f[1],acres:Number(f[2])});g.acres+=Number(f[2]);for(const l of r.lines){const v=qtyBase(l.rate,l.unit,r.gpa,f[2]);const k=l.name.toLowerCase().trim()+'|'+v.kind;for(const dest of [g.products,totals]){if(!dest.has(k))dest.set(k,{name:l.name,kind:v.kind,base:0,packSize:Number(l.packSize)||0,packUnit:l.packUnit});const x=dest.get(k);x.base+=v.amount;if(x.packSize&&l.packSize&&(x.packSize!==Number(l.packSize)||x.packUnit!==l.packUnit))warnings.push('Different package sizes for '+l.name+'; using first package size')}}}return {farmer,crop,year:year(),groups:[...groups.values()].map(g=>({...g,products:[...g.products.values()]})),totals:[...totals.values()],warnings:[...new Set(warnings)]}}
+function calculate(){const farmer=S('sprayFarmer').value,crop=S('sprayCrop').value;const fs=yearFields().filter(f=>f[4]===farmer&&f[3]===crop&&fieldYearConfirmed(f[0]));const groups=new Map(),totals=new Map(),warnings=[];for(const f of fs){const r=getRecipe(resolveRecipe(f));if(!r)continue;if(r.crop&&r.crop!==f[3]){warnings.push(f[0]+': recipe crop mismatch');continue}if(!groups.has(r.id))groups.set(r.id,{recipe:structuredClone(r),fields:[],products:new Map(),acres:0});const g=groups.get(r.id);g.fields.push({id:f[0],name:f[1],acres:Number(f[2])});g.acres+=Number(f[2]);for(const l of r.lines){const v=qtyBase(l.rate,l.unit,r.gpa,f[2]);const k=l.name.toLowerCase().trim()+'|'+v.kind;for(const dest of [g.products,totals]){if(!dest.has(k))dest.set(k,{name:l.name,kind:v.kind,base:0,packSize:Number(l.packSize)||0,packUnit:l.packUnit});const x=dest.get(k);x.base+=v.amount;if(x.packSize&&l.packSize&&(x.packSize!==Number(l.packSize)||x.packUnit!==l.packUnit))warnings.push('Different package sizes for '+l.name+'; using first package size')}}}return {farmer,crop,year:year(),groups:[...groups.values()].map(g=>({...g,products:[...g.products.values()]})),totals:[...totals.values()],warnings:[...new Set(warnings)]}}
 function productTable(products){return `<table class="spray-table"><thead><tr><th>Product</th><th>Exact amount</th><th>Containers</th></tr></thead><tbody>${products.map(p=>{const pk=p.packSize&&((p.kind==='weight')===(p.packUnit==='oz wt'||p.packUnit==='lb'))?Math.ceil((p.base-1e-8)/packBase(p.packSize,p.packUnit)):null;return `<tr><td>${esc(p.name)}</td><td>${esc(displayQty(p.base,p.kind))}</td><td>${pk===null?'—':`${pk} × ${fmt(p.packSize)} ${esc(p.packUnit)}`}</td></tr>`}).join('')}</tbody></table>`}
 function orderHtml(data,print=false){return `<div class="spray-report"><h2>Spray Order — ${esc(farmerNames[data.farmer]||data.farmer)}</h2><p class="muted">${esc(data.crop)} · ${data.year} · ${data.groups.reduce((n,g)=>n+g.fields.length,0)} fields · ${fmt(data.groups.reduce((n,g)=>n+g.acres,0))} assigned acres</p>${data.groups.map(g=>`<section class="spray-ordergroup"><h3>${esc(g.recipe.name)} — ${fmt(g.acres)} acres</h3><p>${g.fields.map(f=>`${esc(f.id)} ${esc(f.name)} (${fmt(f.acres)} ac)`).join(' · ')}</p><p class="muted">Carrier volume: ${fmt(g.recipe.gpa)} GPA${g.recipe.notes?' · '+esc(g.recipe.notes):''}</p><table class="spray-table"><thead><tr><th>Product</th><th>Rate</th><th>Exact amount</th></tr></thead><tbody>${g.recipe.lines.map(l=>{const v=qtyBase(l.rate,l.unit,g.recipe.gpa,g.acres);return `<tr><td>${esc(l.name)}</td><td>${fmt(l.rate)} ${esc(l.unit)}</td><td>${esc(displayQty(v.amount,v.kind))}</td></tr>`}).join('')}</tbody></table></section>`).join('')}<h3>Farmer chemical totals and estimated containers</h3>${productTable(data.totals)}${data.warnings.length?`<p class="spray-warning">Review: ${esc(data.warnings.join('; '))}</p>`:''}<p class="muted">Container quantities are rounded up after combining all assigned fields. Verify product labels, rates, tank mixes, and spray instructions before sending. This document is not a pesticide label.</p></div>`}
 function renderPreview(){const data=calculate();S('sprayPreview').innerHTML=data.groups.length?orderHtml(data):'<p class="muted">Assign at least one recipe to preview the order.</p>';S('spraySaveOrder').disabled=!data.groups.length}
@@ -245,6 +353,12 @@ S('spraySaveOrder').onclick=async()=>{const data=calculate();if(!data.groups.len
 S('sprayOrderHistory').onclick=async e=>{const b=e.target.closest('button');if(!b)return;const id=b.dataset.vieworder||b.dataset.deleteorder;const o=orders.find(x=>x.id===id);if(!o)return;if(b.dataset.deleteorder){if(!confirm('Delete saved order '+o.number+'?'))return;orders=orders.filter(x=>x.id!==id);await save();renderOrders();S('spraySavedOrder').innerHTML='';return}S('spraySavedOrder').innerHTML=orderHtml(o.data)+`<div class="actions"><button class="primary" id="sprayPrintSaved">Print / Save PDF</button></div>`;S('sprayPrintSaved').onclick=()=>printable(orderHtml(o.data));S('spraySavedOrder').scrollIntoView({behavior:'smooth',block:'start'})};
 S('sprayBackup').onclick=()=>{downloadJson({format:'FieldScoutSprayBackup',version:1,exportedAt:new Date().toISOString(),recipes,products,assignments,orders},'FieldScout-spray-backup-'+today()+'.json');setMessage('Spray backup prepared. Save it in Google Drive.')};
 S('sprayRestore').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{if(file.size>20*1024*1024)throw Error('File too large');const d=JSON.parse(await file.text());if(d.format!=='FieldScoutSprayBackup'||d.version!==1||!Array.isArray(d.recipes)||!Array.isArray(d.products)||!Array.isArray(d.orders)||!d.assignments||typeof d.assignments!=='object')throw Error('Invalid spray backup');if(!confirm('Restore spray backup? This replaces the recipes, products, assignments, and spray orders on this device.'))return;recipes=d.recipes;products=d.products;orders=d.orders;assignments=d.assignments;await save();resetEditor();renderAll();setMessage('Spray backup restored.')}catch(err){setMessage('Restore failed: '+err.message)}finally{e.target.value=''}};
+window.addEventListener('fieldscout:settings-downloaded',e=>{
+ const relevant=(e.detail?.keys||[]).filter(k=>k.startsWith('spray-'));
+ if(!relevant.length)return;
+ if(S('sprayRecipeName').value.trim()||lines.length){setMessage('New spray information was synced. Finish or clear this draft and reopen the spray tab to refresh.');return}
+ load();
+});
 S('sprayProductUnit').innerHTML=opt(packs,'gal');S('sprayProductRateUnit').innerHTML=opt(units,'fl oz/ac');load();
 })();
 
@@ -341,7 +455,7 @@ function schedule(){clearTimeout(debounce);debounce=setTimeout(()=>runSync(),150
 const fs72Prefix='fs72:';
 const fs72Base=k=>fs72Prefix+'base:'+k;
 const fs72Conflict=k=>fs72Prefix+'conflict:'+k;
-const fs72Skip=k=>k.startsWith('v7-')||k.startsWith('fs72:')||k.startsWith('v705-')||k.startsWith('fs-last-');
+const fs72Skip=k=>k==='cropYear'||k==='plan'||k.startsWith('v7-')||k.startsWith('fs72:')||k.startsWith('v705-')||k.startsWith('fs-last-');
 const fs72Eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 async function fs72Save(category,key,value,rev){
  const {data,error}=await client.rpc('field_scout_save',{p_category:category,p_record_key:key,p_data:value,p_expected_revision:rev});
@@ -351,20 +465,20 @@ async function fs72Save(category,key,value,rev){
 async function syncExtraSettings(){
  const {data:cloud,error}=await client.from('field_scout_sync').select('record_key,data,revision').eq('category','setting').range(0,9999);
  if(error)throw error;
- const remote=new Map((cloud||[]).filter(x=>!x.record_key.startsWith('backup-')).map(x=>[x.record_key,x]));
+ const remote=new Map((cloud||[]).filter(x=>!x.record_key.startsWith('backup-')&&!fs72Skip(x.record_key)).map(x=>[x.record_key,x]));
  const local=new Map((await getAll('settings')).filter(x=>!fs72Skip(x.key)).map(x=>[x.key,x.value]));
- let uploaded=0,downloaded=0,extraConflictCount=0;
+ let uploaded=0,downloaded=0,extraConflictCount=0;const downloadedKeys=[];
  for(const [key,r] of remote){
   const base=await setting(fs72Base(key));const hasLocal=local.has(key);const value=local.get(key);
   if(!hasLocal){
    if(base!==undefined){await put(fs72Conflict(key),{key,reason:'Local setting missing',local:null,remote:r.data});extraConflictCount++;continue}
-   await put(key,r.data);await put(fs72Base(key),{data:r.data,revision:r.revision});downloaded++;continue;
+   await put(key,r.data);await put(fs72Base(key),{data:r.data,revision:r.revision});downloaded++;downloadedKeys.push(key);continue;
   }
   if(fs72Eq(value,r.data)){
    await put(fs72Base(key),{data:r.data,revision:r.revision});await del(fs72Conflict(key));continue;
   }
   if(base&&fs72Eq(value,base.data)){
-   await put(key,r.data);await put(fs72Base(key),{data:r.data,revision:r.revision});await del(fs72Conflict(key));downloaded++;continue;
+   await put(key,r.data);await put(fs72Base(key),{data:r.data,revision:r.revision});await del(fs72Conflict(key));downloaded++;downloadedKeys.push(key);continue;
   }
   if(base&&fs72Eq(r.data,base.data))continue;
   await put(fs72Conflict(key),{key,reason:'Both devices have different data',local:value,remote:r.data});extraConflictCount++;
@@ -394,7 +508,12 @@ async function syncExtraSettings(){
   }
  }
  await fs72RenderConflicts();
- return {uploaded,downloaded,conflicts:extraConflictCount,backup};
+ if(downloadedKeys.length){
+  await window.fieldScoutRefreshStoredSettings?.(downloadedKeys);
+  window.dispatchEvent(new CustomEvent('fieldscout:settings-downloaded',{detail:{keys:downloadedKeys}}));
+ }
+ const outstanding=(await getAll('settings')).filter(x=>x.key.startsWith(fs72Prefix+'conflict:')).length;
+ return {uploaded,downloaded,conflicts:outstanding,backup};
 }
 async function fs72RenderConflicts(){
  const box=document.getElementById('fs72Conflicts');if(!box)return;
@@ -501,7 +620,7 @@ async function runSync(){
   records=(await getAll('notes')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt));
   renderDashboard();if(current)renderHistory();
   const extras=await syncExtraSettings();
-  await report('Cloud check finished. Notes: '+uploaded+' uploaded, '+downloaded+' downloaded. Other data: '+extras.uploaded+' uploaded, '+extras.downloaded+' downloaded; '+extras.conflicts+' items need review. '+(extras.backup?'Daily cloud snapshot verified.':'Cloud snapshot not verified.'));
+  await report(((await conflicts()).length||extras.conflicts?'Needs review':'Up to date')+' — Notes: '+uploaded+' uploaded, '+downloaded+' downloaded. Other data: '+extras.uploaded+' uploaded, '+extras.downloaded+' downloaded; '+extras.conflicts+' settings need review. '+(extras.backup?'Daily cloud snapshot verified.':'Cloud snapshot not verified.'));
 
  }catch(e){await report('Sync incomplete — local notes kept. '+(e.message||e))}
  finally{busy=false;if(pending){pending=false;setTimeout(runSync,500)}}
@@ -524,22 +643,30 @@ el('v7ExportConflicts').onclick=async()=>{
  const blob=new Blob([JSON.stringify({format:'FieldScoutV7ConflictReview',exportedAt:new Date().toISOString(),conflicts:c},null,2)],{type:'application/json'});
  const a=document.createElement('a');a.href=window.URL.createObjectURL(blob);a.download='field-scout-conflicts-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>window.URL.revokeObjectURL(a.href),1000);
 };
-window.addEventListener('online',runSync);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)runSync()});
-setInterval(()=>{if(!document.hidden&&navigator.onLine)runSync()},60000);
-// Listen for local note saves without modifying the original transaction function.
+window.addEventListener('online',()=>{if(client)runSync();else initializeCloudClient()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){if(client)runSync();else if(navigator.onLine)initializeCloudClient()}});
+setInterval(()=>{if(!document.hidden&&navigator.onLine){if(client)runSync();else initializeCloudClient()}},60000);
+// Listen for local notes and editable settings without changing their transaction semantics.
 const originalTransaction=transaction;
 transaction=async function(stores,mode,fn){
  const result=await originalTransaction(stores,mode,fn);
- if(mode==='readwrite'&&stores.includes('notes'))schedule();
+ if(mode==='readwrite'&&(stores.includes('notes')||(stores.includes('settings')&&!busy&&!resolving)))schedule();
  return result;
 };
-try{
- const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
- client=createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true}});
- client.auth.onAuthStateChange(()=>{setTimeout(runSync,100)});
- await runSync();
-}catch(e){await report('Cloud sign-in unavailable. Local-only mode. '+e.message)}
+let initializingCloud=false;
+async function initializeCloudClient(){
+ if(client||initializingCloud||!navigator.onLine)return;
+ initializingCloud=true;
+ try{
+  const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+  client=createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+  client.auth.onAuthStateChange(()=>setTimeout(runSync,100));
+  await runSync();
+ }catch(e){await report('Cloud sign-in unavailable. Notes still save locally. Reconnect to retry. '+e.message)}
+ finally{initializingCloud=false}
+}
+if(navigator.onLine)initializeCloudClient();
+else report('Offline — notes are saved on this device; cloud will retry when connected.');
 </script>
 <script>
 (function(){
@@ -635,7 +762,7 @@ try{
  $('v71Excel').onclick=async()=>{try{
   if(!ready)throw Error('Local storage is not ready');
   const all=await getAll('notes');const headings=['Visit Date','Field ID','Field Name','Operator','Crop Year','Crop','Acres','Note','Follow-up Date','Visit Type','Deleted','Record ID'];
-  const lines=[headings,...all.sort((a,b)=>String(a.createdAt).localeCompare(String(b.createdAt))).map(r=>{const f=fields.find(f=>f[0]===r.fieldId),a=annual?.[(r.cropYear||2026)+'|'+r.fieldId];return [r.createdAt,r.fieldId,(fieldIdentity[r.fieldId]?.name??f?.[1]??''),f?(farmerNames[fieldIdentity[r.fieldId]?.operator??f[4]]||fieldIdentity[r.fieldId]?.operator||f[4]):'',r.cropYear||2026,a?.crop||f?.[3]||'',a?.acres??f?.[2]??'',r.text,r.followup||'',r.visitType||'observation',r.deletedAt?'Yes':'No',r.id]})];
+  const lines=[headings,...all.sort((a,b)=>String(a.createdAt).localeCompare(String(b.createdAt))).map(r=>{const f=fields.find(f=>f[0]===r.fieldId),year=Number(r.cropYear||2026),a=f?annualForYear(f,year):null,i=f?identityForYear(f,year):null,s=r.fieldSnapshot||{};return [r.createdAt,r.fieldId,s.name??i?.name??'',farmerNames[s.operator??i?.operator]||s.operator||i?.operator||'',year,s.crop??a?.crop??'',s.acres??a?.acres??'',r.text,r.followup||'',r.visitType||'observation',r.deletedAt?'Yes':'No',r.id]})];
   download('\ufeff'+lines.map(row=>row.map(csvCell).join(',')).join('\r\n'),'FieldScout-all-notes-'+stamp()+'.csv','text/csv;charset=utf-8');
   $('v71ExportStatus').textContent='Export prepared: '+all.length+' scouting records, all available years. Open the CSV in Excel.';
  }catch(e){$('v71ExportStatus').textContent='Export failed: '+e.message}};
