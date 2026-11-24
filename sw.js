@@ -1,7 +1,7 @@
 /* Field Scout 7.4.0 development build. Cache entries belong to this installation path. */
 const PREFIX = 'field-scout:' + self.registration.scope + ':';
-const CACHE = PREFIX + '7.4.0-dev-fertility';
-const PRECACHE = ['./', './index.html', './manifest.webmanifest', './field-plan.js?v=7.4.0-dev', './farmer-notes.js?v=7.4.0-dev', './fertilizer-blend.js?v=7.4.0-dev', './fertility-ui.js?v=7.4.0-dev'];
+const CACHE = PREFIX + '7.4.0-rc1';
+const PRECACHE = ['./', './index.html', './manifest.webmanifest', './field-plan.js?v=7.4.0-rc1', './farmer-notes.js?v=7.4.0-rc1', './fertilizer-blend.js?v=7.4.0-rc1', './fertility-recommendations.js?v=7.4.0-rc1', './fertility-ui.js?v=7.4.0-rc1'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(PRECACHE)));
