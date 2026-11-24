@@ -26,7 +26,7 @@
    save.disabled=busy||!ids.length;
   }catch(e){if(t===ticket)$('fnStatus').textContent='Could not load farmer notes: '+e.message}
  }
- panel.addEventListener('toggle',refresh);farmer.onchange=refresh;$('fnSearch').oninput=refresh;window.addEventListener('fieldscout:field-context',refresh);
+ panel.addEventListener('toggle',refresh);farmer.onchange=refresh;$('fnSearch').oninput=refresh;window.addEventListener('fieldscout:field-context',refresh);window.addEventListener('fieldscout:settings-downloaded',refresh);
  $('fnForm').onsubmit=async e=>{
   e.preventDefault();if(busy||save.disabled||!ready)return;
   const text=$('fnText').value.trim(),date=$('fnDate').value,due=$('fnDue').value;
