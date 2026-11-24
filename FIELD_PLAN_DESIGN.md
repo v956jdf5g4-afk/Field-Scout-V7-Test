@@ -40,3 +40,7 @@ The existing full-device JSON includes all plan settings. The existing authentic
 The existing public app shell still contains the roster. It should move to owner-authorized storage and be cached on this device after authenticated setup or provisioned from a verified local backup. Keep stable field IDs and preserve the baseline year, note links and historical snapshots. Audit Supabase table policies, grants and the save RPC before consenting to use real plan data. Test owner and non-owner behavior with synthetic data. Inventory old Pages artifacts, public Git history, and caches separately since changing the current shell does not retract earlier copies. Confirm offline startup on a configured iPad and first-time setup in an empty browser before switching the roster source. See the official Supabase guide at https://supabase.com/docs/guides/database/postgres/row-level-security.
 
 Farmer Notes, supported soil-test recommendations and blend math remain approved future work. Keep those records out of the static bundle and validate recommendations against applicable extension source examples before use.
+
+### Private roster recovery prerequisite
+
+Store a restored roster under a device-local setting excluded from cloud settings sync. Load it before validating historical field references or rendering crop filters. Legacy full-device JSON already carries the baseline roster in `staticFields`, so the backup format remains version 1. Live account-based roster download and removal of bundled names are subsequent work.
