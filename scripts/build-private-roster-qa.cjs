@@ -59,10 +59,13 @@ manifest.name = 'Field Scout Private Roster QA';
 manifest.short_name = 'Roster QA';
 delete manifest.icons;
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'field-scout-roster-qa-'));
-const worker = read('sw.js').replace("'7.4.0-dev'", "'private-roster-qa-v1'");
+const worker = read('sw.js').replace(/const CACHE = PREFIX \+ '[^']+';/, "const CACHE = PREFIX + 'private-roster-qa-v2';");
 for (const [file, contents] of Object.entries({
   'index.html': html,
   'field-plan.js': read('field-plan.js'),
+  'farmer-notes.js': read('farmer-notes.js'),
+  'fertilizer-blend.js': read('fertilizer-blend.js'),
+  'fertility-ui.js': read('fertility-ui.js'),
   'manifest.webmanifest': JSON.stringify(manifest, null, 2),
   'sw.js': worker,
 })) fs.writeFileSync(path.join(directory, file), contents);
