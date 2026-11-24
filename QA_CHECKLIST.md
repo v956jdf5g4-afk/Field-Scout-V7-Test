@@ -84,3 +84,17 @@ Run `node scripts/build-private-roster-qa.cjs` to generate an isolated QA bundle
 
 - [x] Generated cloud-disabled and synthetic-endpoint builds. Inline JavaScript parses, existing mock and regression checks pass, and the configured app backend is rejected.
 - [ ] Live sign-in and roster loading need a separate Supabase project and disposable users. No existing app deployed or real roster migrated.
+
+## V7.4.0-rc1 — review checkpoint
+
+Code `0aba28bc312d1b635a9db9976adcad760db2df45`; tests `53d623d58ce836bd55cb8a0f02225e251995c3e3`. Cloud-disabled sample branch `v7.4.0-rc1-sample-qa` (`707789a51ebe36ec50b4b3c786a278f0e320b05a`), generated with `node scripts/build-private-roster-qa.cjs --sample`.
+
+- [x] V8 execution of repository test code with simulated Node I/O: all five modules and inline app code parse; correct load order and precache; dry blend hand calculation and invalid inputs; SDSU/NDSU supported examples and deferred cases; independent plan/blend passes and overlapping revisions; contact completion leaves other notes; new settings keys included in existing transport; malformed backup references rejected.
+- [x] Executed actual spray source with synthetic fields: mixed per-acre and per-100-gallon rates, confirmed acres, package rounding, plan-selected subset, distinct recipe snapshots and frozen acres/rates.
+- [x] Executed actual QA builder using simulated filesystem: blank and sample bundles exclude configured backend and original roster names, use different storage, and include every module. Simulated QA worker install, scope cleanup and offline navigation passed. Verified sample branch files.
+- [ ] Actual desktop browser/iPad: add/search farmer notes, optional links and independent contact reminders; change year and preserve unsaved draft; verify history and complete one reminder.
+- [ ] Actual devices: bulk field plan, revise one field, add multiple passes, link note, check shared prepay and farmer roll-up; report prior calendar-year work against target year. Generate an order from selected current plan snapshots and verify later recipe/acre changes cannot rewrite the saved order.
+- [ ] Actual devices: soil test, source/method/depth/unit rejection, supported and manual-review nutrients; product library, balancing, dry blend, linked operation, conflicting or completed work protection, pass revision, unsaved-context protection.
+- [ ] Actual browser offline reopen and export/restore full JSON on isolated origin; confirm old records preserved and malformed backups rejected. Test empty roster recovery separately.
+- [ ] Live disposable backend: sign-in, owner/second-account/signed-out isolation, additive records, concurrent edits, restore and cross-device sync. No real records until privacy and recovery gates pass.
+- [ ] Consultant review of source-specific recommendation cases, remaining ND economic N/S manual review, application placement and cumulative multi-pass nutrient accounting. No production promotion until accepted.
