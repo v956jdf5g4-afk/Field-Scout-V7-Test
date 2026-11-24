@@ -80,10 +80,11 @@ assert.throws(() => runBackup({...backup, settings: [
 function simulatedDevice() {
   const data = {notes:new Map(), settings:new Map()};
   const transaction = (stores, mode, work) => {
-    assert.deepEqual(Array.from(stores), ['notes','settings']);
+    assert.ok(stores.includes('settings'));
     assert.equal(mode, 'readwrite');
     const staged = Object.fromEntries(stores.map(store => [store, new Map(data[store])]));
-    const count = {result: staged.notes.size};
+    const count = {result: staged.notes?.size};
+    const requests = [];
     let aborted = false;
     work({
       abort() { aborted = true; },
@@ -92,11 +93,12 @@ function simulatedDevice() {
         return {
           clear: () => rows.clear(),
           put: item => rows.set(item.id ?? item.key, item),
-          get: key => ({result: rows.get(key)}),
+          get: key => { const req = {result: rows.get(key)}; requests.push(req); return req; },
           count: () => count,
         };
       },
     });
+    for (const request of requests) request.onsuccess?.();
     count.onsuccess?.();
     if (aborted) throw Error('Transaction aborted');
     Object.assign(data, staged);
@@ -112,3 +114,46 @@ assert.throws(() => runBackup(backup, [], blank.transaction, 'restoreFullBackup'
 assert.deepEqual(blank.data.notes.get(note.id), note);
 runBackup(backup, roster, blank.transaction, 'restoreFullBackup');
 console.log('PASS: legacy JSON initializes a blank roster, rejects invalid data, and restores roster, annual settings, and notes in one simulated transaction.');
+
+async function checkSignedInRoster() {
+  const source = html.slice(html.indexOf('async function ensurePrivateRoster('), html.indexOf('async function runSync('));
+  const device = simulatedDevice();
+  let reads = 0;
+  let reloads = 0;
+  let activeUser = 'owner';
+  let cloudRow = {data: roster};
+  const query = {
+    select: () => query,
+    eq: (column, value) => {
+      if (column === 'user_id') assert.equal(value, 'owner');
+      return query;
+    },
+    maybeSingle: async () => { reads++; return {data: cloudRow}; },
+  };
+  const context = vm.createContext({
+    fields: [], transaction: device.transaction,
+    setting: async key => device.data.settings.get(key)?.value,
+    client: {from: () => query, auth: {getSession: async () => ({data: {session: {user: {id: activeUser}}}})}},
+    location: {reload: () => { reloads++; }},
+  });
+  vm.runInContext(rosterValidator + source, context);
+  const install = user => vm.runInContext('ensurePrivateRoster(user)', Object.assign(context, {user}));
+  await assert.rejects(install(null), /Sign in/);
+  assert.equal(reads, 0);
+  cloudRow = null;
+  await assert.rejects(install('owner'), /not been set up/);
+  cloudRow = {data: roster};
+  activeUser = 'other';
+  await assert.rejects(install('owner'), /account changed/);
+  assert.equal(device.data.settings.size, 0);
+  activeUser = 'owner';
+  assert.equal(await install('owner'), false);
+  assert.equal(reloads, 1);
+  assert.deepEqual(device.data.settings.get('v7-restored-roster-v1').value, roster);
+  context.fields = roster;
+  await assert.rejects(install('other'), /belongs to another account/);
+  assert.equal(await install('owner'), true);
+  assert.equal(reads, 3);
+  console.log('PASS: draft roster loader requires sign-in, validates owner, blocks account changes and reuses the installed roster.');
+}
+checkSignedInRoster().catch(error => { console.error(error); process.exitCode = 1; });
