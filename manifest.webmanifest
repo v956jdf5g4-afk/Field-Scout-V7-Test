@@ -1,13 +1,9 @@
 {
-  "name": "Field Scout V7.4.0-rc1 Review",
-  "short_name": "Scout V7.4 RC",
+  "name": "Field Scout Private Roster QA",
+  "short_name": "Roster QA",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f6fbf7",
-  "theme_color": "#193b29",
-  "icons": [
-    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
-    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"}
-  ]
+  "theme_color": "#193b29"
 }
