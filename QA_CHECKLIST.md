@@ -64,3 +64,6 @@ Run `node tests/field-plan-check.cjs` with Node 18 or later. The checks use synt
 - `node tests/private-roster-check.cjs` passed against the draft with synthetic rows. Mock account transport and local storage preserve field IDs, the 2026 baseline, the 2027 override and historical note references. This does not exercise live Supabase or browser persistence.
 - The existing full-device JSON validator accepts a matching roster and rejects an empty or different roster. Fresh-device offline recovery needs a validated bootstrap that stages the roster and dependent data and commits them in the same local transaction. Preserve existing field IDs and fail safely if the backup does not match an already-initialized device.
 - No app code, deployment, database configuration, or real-device QA changed. The check can be removed by reverting its commit.
+
+- [x] Simulated fresh-device JSON recovery validates the roster, preserves annual settings and note IDs, and writes all three in one transaction. Duplicate fields, orphan notes, roster mismatch, and a concurrent initialization are rejected. Existing synthetic planner/spray/cache checks passed.
+- [ ] Verify a real offline restore on desktop and iPad using an isolated no-roster test shell. Workspace Chromium cannot open a process socket here. Live Supabase was not exercised.
