@@ -8,7 +8,9 @@
     prepay: 'Chemical prepay',
     fall: 'Fall herbicide',
     strip: 'Strip-till fertilizer',
-    broadcast: 'Broadcast fertilizer'
+    broadcast: 'Broadcast fertilizer',
+    starter: 'Starter fertilizer',
+    otherfert: 'Other fertilizer'
   };
   const states = { planned: 'Planned', needed: 'Still needed', reported: 'Farmer-reported complete' };
   const node = (tag, label) => {
@@ -28,7 +30,7 @@
     <form id="fpForm">
       <fieldset><legend>Fields to update</legend>
         <button type="button" id="fpSelectAll">Select all shown</button>
-        <div id="fpFields"></div>
+        <p id="fpSummary"></p><div id="fpFields"></div>
       </fieldset>
       <label>Plan or operation <select id="fpType"></select></label>
       <label>Pass / separate item <input id="fpPass" type="number" min="1" max="20" step="1" value="1" required></label><small>Use the same number to revise; a different number adds another pass or prepaid product.</small><label>Status <select id="fpState"></select></label>
@@ -53,7 +55,7 @@
   }
 
   function stateOptions() {
-    const isWork = ['fall', 'strip', 'broadcast', 'preemerge', 'postemerge'].includes(type.value);
+    const isWork = ['fall', 'strip', 'broadcast', 'starter', 'otherfert', 'preemerge', 'postemerge'].includes(type.value);
     const options = Object.entries(states).filter(([key]) => isWork || key === 'planned');
     replaceOptions(state, options.map(([key, label]) => option(key, label)));
     $('fpWorkLabel').hidden = state.value !== 'reported';
@@ -107,6 +109,7 @@
           const original=entry.targets.find(t=>t.fieldId===id).previous.length===0;
           const marker=(heads.includes(entry)?(heads.length>1?'Needs review · ':'Current · '):'')+(original?'Initial entry · ':'');
           const li=node('li',marker+describe(entry));
+          if(entry.blendId){const blend=settings.find(r=>r.key==='fertility-v1:'+entry.blendId)?.value;if(blend?.calculation){const d=node('details');d.append(node('summary','Saved fertilizer blend'),node('p',blend.calculation.rows.map(r=>r.name+' '+r.rate+' lb/ac').join('; ')));li.append(d)}}
           if(entry.contactId){
             const contact=settings.find(r=>r.key==='farmer-note-v1:'+entry.contactId)?.value;
             if(contact){const related=node('details');related.append(node('summary','Related farmer conversation · '+contact.date),node('p',contact.text));li.append(related)}
@@ -151,6 +154,9 @@
       if(draftScope===null||!hasDraft())draftScope=context;
       replaceOptions($('fpContact'),[option('','None'),...settings.filter(r=>r.key.startsWith('farmer-note-v1:')&&r.value?.kind==='note'&&r.value.farmer===farmer.value).map(r=>r.value).sort((a,b)=>b.date.localeCompare(a.date)).map(n=>option(n.id,n.date+' · '+(n.topic||n.text.slice(0,60))))]);
       replaceOptions(recipe, [option('', 'Choose recipe'), ...(recipes || []).filter(item => candidates.some(field => !item.crop || item.crop === field[3])).map(item => option(item.id, item.name))]);
+      const counts={planned:0,needed:0,reported:0,review:0};let prepay=0;
+      for(const f of candidates)for(const category of Object.keys(types))for(const pass of new Set(entries.filter(e=>e.type===category&&e.targets?.some(t=>t.fieldId===f[0])).map(e=>e.pass||1))){const h=headsFor(historyFor(entries,f[0],category,pass),f[0]);if(category==='prepay'){prepay++;if(h.length>1)counts.review++;continue}if(h.length!==1)counts.review++;else if(Object.hasOwn(counts,h[0].state))counts[h[0].state]++}
+      $('fpSummary').textContent=candidates.length+' fields · '+counts.planned+' planned · '+counts.needed+' still needed · '+counts.reported+' farmer-reported complete · '+counts.review+' needing review · '+prepay+' prepaid item/field references (not application counts).';
       displayedHeads = new Map();
       $('fpFields').replaceChildren(...candidates.map(field => fieldRow(field, entries, selected, settings)));
       if (!candidates.length) $('fpFields').textContent = 'No fields match these filters.';
