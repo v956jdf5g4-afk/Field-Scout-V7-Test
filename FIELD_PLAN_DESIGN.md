@@ -44,3 +44,5 @@ Farmer Notes, supported soil-test recommendations and blend math remain approved
 ### Private roster recovery prerequisite
 
 Store a restored roster under a device-local setting excluded from cloud settings sync. Load it before validating historical field references or rendering crop filters. Legacy full-device JSON already carries the baseline roster in `staticFields`, so the backup format remains version 1. Live account-based roster download and removal of bundled names are subsequent work.
+
+The authenticated roster loader reads the owner-scoped `v7-private-roster-v1` record from the existing settings category. Cloud and local roster metadata are excluded from generic settings sync. A matching owner binding is required for later sync. A backup-restored roster needs an exact match against the account roster before the app binds it. Provisioning real records and removing bundled names are separate changes.
