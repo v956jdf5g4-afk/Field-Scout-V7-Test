@@ -10,6 +10,7 @@ const path = require('node:path');
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const yearFunctions = html.slice(html.indexOf('const UNCONFIRMED_CROP='), html.indexOf('function fieldAcresLabel('));
 const recordValidator = html.split('\n').find(line => line.startsWith('function validRecord('));
+const rosterValidator = html.slice(html.indexOf("const restoredRosterKey="), html.indexOf('function transaction('));
 const backupValidator = html.slice(html.indexOf(' function checkFullBackup('), html.indexOf(' restoreFile.onchange='));
 assert.ok(yearFunctions && recordValidator && backupValidator);
 
@@ -25,11 +26,11 @@ const note = {
 const annual = {'2027|TEST1': {crop: 'Spring wheat', acres: 78, confirmed: true}};
 const accounts = new Map([['sample-owner', roster]]);
 const downloadRoster = user => structuredClone(accounts.get(user) ?? null);
-const readBackup = (backup, fields) => {
-  const context = vm.createContext({backup, fields});
+const runBackup = (backup, fields, transaction, operation = 'checkFullBackup') => {
+  const context = vm.createContext({backup, fields, transaction});
   vm.runInContext('const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);\n' +
-    recordValidator + '\n' + backupValidator, context);
-  return vm.runInContext('checkFullBackup(backup)', context);
+    rosterValidator + '\n' + recordValidator + '\n' + backupValidator, context);
+  return vm.runInContext(operation + '(backup)', context);
 };
 
 assert.equal(downloadRoster(null), null);
@@ -59,10 +60,55 @@ const backup = JSON.parse(JSON.stringify({
   staticFields: device.get('roster'), notes: device.get('notes'),
   settings: [{key: 'annual-test-fixture', value: device.get('annual')}],
 }));
-assert.deepEqual(readBackup(backup, device.get('roster')).notes, [note]);
-assert.throws(() => readBackup(backup, []), /Field list differs/);
+assert.deepEqual(runBackup(backup, device.get('roster')).notes, [note]);
+assert.deepEqual(runBackup(backup, []).notes, [note]);
 const mismatch = structuredClone(backup);
 mismatch.staticFields[0][0] = 'OTHER';
-assert.throws(() => readBackup(mismatch, device.get('roster')), /Field list differs/);
+assert.throws(() => runBackup(mismatch, device.get('roster')), /Field list differs/);
 console.log('PASS: simulated owner roster handoff and offline reopen preserve field IDs, annual crops and historical notes.');
-console.log('PASS: existing JSON validator accepts the matching roster and rejects a fresh install or a different roster.');
+for (const [rows, pattern] of [
+  [[roster[0], roster[0]], /duplicate field/],
+  [[['TEST1', 'Sample North', -1, 'Corn', 'SAMPLE']], /Invalid or duplicate field/],
+  [[roster[1]], /Invalid or duplicate scouting note/],
+]) {
+  assert.throws(() => runBackup({...backup, staticFields: rows}, []), pattern);
+}
+assert.throws(() => runBackup({...backup, settings: [
+  {key:'v7-restored-roster-v1',value:mismatch.staticFields},
+]}, []), /Invalid or duplicate setting/);
+
+function simulatedDevice() {
+  const data = {notes:new Map(), settings:new Map()};
+  const transaction = (stores, mode, work) => {
+    assert.deepEqual(Array.from(stores), ['notes','settings']);
+    assert.equal(mode, 'readwrite');
+    const staged = Object.fromEntries(stores.map(store => [store, new Map(data[store])]));
+    const count = {result: staged.notes.size};
+    let aborted = false;
+    work({
+      abort() { aborted = true; },
+      objectStore(name) {
+        const rows = staged[name];
+        return {
+          clear: () => rows.clear(),
+          put: item => rows.set(item.id ?? item.key, item),
+          get: key => ({result: rows.get(key)}),
+          count: () => count,
+        };
+      },
+    });
+    count.onsuccess?.();
+    if (aborted) throw Error('Transaction aborted');
+    Object.assign(data, staged);
+  };
+  return {data, transaction};
+}
+const blank = simulatedDevice();
+runBackup(backup, [], blank.transaction, 'restoreFullBackup');
+assert.deepEqual(blank.data.settings.get('v7-restored-roster-v1').value, roster);
+assert.deepEqual(blank.data.settings.get('annual-test-fixture').value, annual);
+assert.deepEqual(blank.data.notes.get(note.id), note);
+assert.throws(() => runBackup(backup, [], blank.transaction, 'restoreFullBackup'), /aborted/);
+assert.deepEqual(blank.data.notes.get(note.id), note);
+runBackup(backup, roster, blank.transaction, 'restoreFullBackup');
+console.log('PASS: legacy JSON initializes a blank roster, rejects invalid data, and restores roster, annual settings, and notes in one simulated transaction.');
