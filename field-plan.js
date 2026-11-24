@@ -37,13 +37,13 @@
       <div id="fpPrepay" hidden><label>Prepaid product <input id="fpPrepayProduct" maxlength="120"></label><label>Farmer-reported total quantity for selected fields <input id="fpPrepayQty" type="number" min="0" step="any"></label><label>Unit <select id="fpPrepayUnit"><option value="gal">gal</option><option value="lb">lb</option><option value="qt">qt</option><option value="pt">pt</option><option value="fl oz">fl oz</option><option value="oz wt">oz wt</option></select></label><small>One shared total, not a quantity per field. Prepaid does not mean applied.</small></div><label id="fpRecipeLabel" hidden>Spray recipe (optional) <select id="fpRecipe"></select></label>
       <button type="submit" id="fpSave">Save to selected fields</button>
     </form>
-    <p id="fpStatus" role="status"></p>`;
+    <p id="fpStatus" role="status"></p><h3>Generate spray order from selected plan</h3><p>Choose one crop, a chemical stage and confirmed fields. Current saved recipe snapshots are used; overlapping or completed plans must be reviewed. No application is reported by generating an order.</p><button type="button" id="fpPreviewOrder">Preview planned order</button><button type="button" id="fpSaveOrder" disabled>Save planned order snapshot</button><div id="fpOrderPreview"></div><h3>Saved plan orders</h3><div id="fpOrderHistory"></div>`;
   const review = $('yearReviewFields').closest('details') || $('yearReviewFields').parentElement;
   review.after(panel);
 
   const farmer = $('fpFarmer'), crop = $('fpCrop'), type = $('fpType'), state = $('fpState');
   const work = $('fpWork'), note = $('fpText'), recipe = $('fpRecipe'), save = $('fpSave');
-  let lastYear, tickets = 0, savingBatch = false, displayedHeads = new Map();
+  let lastYear, tickets = 0, savingBatch = false, displayedHeads = new Map(), previewOrder=null, savingOrder=false;
   type.replaceChildren(...Object.entries(types).map(([key, label]) => option(key, label)));
 
   function replaceOptions(select, options) {
@@ -119,6 +119,7 @@
 
   async function render() {
     if (!panel.open || !ready) return;
+    invalidatePreview();
     const ticket = ++tickets;
     const year = cropYear;
     const previousScope = lastYear === year;
@@ -141,6 +142,7 @@
       $('fpFields').replaceChildren(...candidates.map(field => fieldRow(field, entries, selected)));
       if (!candidates.length) $('fpFields').textContent = 'No fields match these filters.';
       lastYear = year;
+      renderOrderHistory(settings,year);
       stateOptions();
     } catch {
       $('fpStatus').textContent = 'Could not read field plans. Reopen the panel to retry.';
@@ -150,11 +152,54 @@
     }
   }
 
+  function invalidatePreview(){
+    previewOrder=null;$('fpSaveOrder').disabled=true;$('fpOrderPreview').replaceChildren();
+  }
+  function renderOrderHistory(settings,year){
+    const list=$('fpOrderHistory');
+    list.replaceChildren(...settings.filter(x=>x.key.startsWith('plan-order-v1:')&&x.value?.data?.year===year&&x.value.data.farmer===farmer.value).map(x=>x.value).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).map(o=>{
+      const d=node('details');d.append(node('summary',o.number+' · '+o.category+' · '+o.data.crop));
+      const report=node('div');report.innerHTML=window.fieldScoutPlanOrder.html(o.data);const print=node('button','Print / Save PDF');print.type='button';print.onclick=()=>window.fieldScoutPlanOrder.print(o.data);d.append(report,print);return d;
+    }));if(!list.children.length)list.textContent='No saved plan orders for this farmer/year.';
+  }
+  async function prepareOrder(){
+    invalidatePreview();if(!ready||lastYear!==cropYear||savingBatch)throw Error('Wait for plans to load.');
+    if(!crop.value||!['herbicide','fall','preemerge','postemerge'].includes(type.value))throw Error('Choose a single crop and chemical stage.');
+    const year=cropYear,operator=farmer.value,fieldCrop=crop.value,category=type.value;
+    const checked=[...panel.querySelectorAll('#fpFields input[type=checkbox]:checked')].map(i=>i.value);
+    if(!checked.length)throw Error('Select fields for this order.');
+    const settings=await getAll('settings');
+    if(year!==cropYear||operator!==farmer.value||fieldCrop!==crop.value||category!==type.value||checked.join('|')!==[...panel.querySelectorAll('#fpFields input[type=checkbox]:checked')].map(i=>i.value).join('|'))throw Error('Selection changed; preview again.');
+    const all=settings.filter(r=>r.key.startsWith(prefix)&&r.value?.year===year).map(r=>r.value);
+    const recipes=Object.create(null),links=[];
+    for(const id of checked){
+      if(!fieldYearConfirmed(id))throw Error(id+' is not confirmed.');
+      const h=headsFor(historyFor(all,id,category),id);
+      if(h.length!==1||h[0].state==='reported'||!h[0].recipe?.snapshot)throw Error(id+': needs one current, incomplete plan with a saved recipe snapshot. Resave legacy recipe links.');
+      const r=h[0].recipe.snapshot;
+      if(!r.id||!Array.isArray(r.lines)||!r.lines.length||!Number.isFinite(Number(r.gpa))||Number(r.gpa)<=0||r.lines.some(l=>!l.name||!Number.isFinite(Number(l.rate))||Number(l.rate)<=0||!['fl oz/ac','pt/ac','qt/ac','gal/ac','oz wt/ac','lb/ac','fl oz/100 gal','pt/100 gal','qt/100 gal','gal/100 gal','oz wt/100 gal','lb/100 gal'].includes(l.unit)))throw Error(id+': invalid recipe snapshot.');
+      recipes[id]=r;links.push({fieldId:id,planId:h[0].id});
+    }
+    const data=window.fieldScoutPlanOrder.calculate({farmer:operator,crop:fieldCrop,recipes});
+    if(data.groups.reduce((n,g)=>n+g.fields.length,0)!==checked.length)throw Error('Some fields could not be included. Review crop and recipe assignments.');
+    previewOrder={data,links,category};$('fpOrderPreview').innerHTML=window.fieldScoutPlanOrder.html(data);$('fpSaveOrder').disabled=savingOrder;
+  }
+  $('fpPreviewOrder').onclick=async()=>{try{await prepareOrder()}catch(e){$('fpStatus').textContent=e.message}};
+  $('fpSaveOrder').onclick=async()=>{
+    if(!previewOrder||savingOrder)return;const shown=JSON.stringify(previewOrder);savingOrder=true;$('fpSaveOrder').disabled=true;
+    try{await prepareOrder();if(!previewOrder||JSON.stringify(previewOrder)!==shown)throw Error('Plan or field data changed. Review the updated preview and save again.');
+      if(!confirm('Save this planned order snapshot? This does not report any application.'))return;
+      const id=crypto.randomUUID(),o={...previewOrder,id,createdAt:new Date().toISOString(),number:'PLAN-'+cropYear+'-'+id.slice(0,8)};
+      await transaction(['settings'],'readwrite',tx=>tx.objectStore('settings').add({key:'plan-order-v1:'+id,value:o}));$('fpStatus').textContent='Saved '+o.number;await render();
+    }catch(e){$('fpStatus').textContent=e.message}finally{savingOrder=false;$('fpSaveOrder').disabled=!previewOrder}
+  };
+  panel.addEventListener('change',e=>{if(e.target.closest('#fpForm')||e.target===farmer||e.target===crop)invalidatePreview()});
   panel.addEventListener('toggle', () => { void render(); });
   farmer.onchange = crop.onchange = () => { void render(); };
   type.onchange = state.onchange = stateOptions;
   $('fpSelectAll').onclick = () => {
-    for (const input of panel.querySelectorAll('input[type=checkbox]:enabled')) input.checked = true;
+    for (const input of panel.querySelectorAll('#fpFields input[type=checkbox]:enabled')) input.checked = true;
+    invalidatePreview();
   };
   window.addEventListener('fieldscout:field-context', () => { void render(); });
   window.addEventListener('fieldscout:settings-downloaded', () => { void render(); });
@@ -196,7 +241,7 @@
         if (!savedRecipe || targets.some(target => savedRecipe.crop && savedRecipe.crop !== target.crop)) {
           throw Error('Choose a recipe that applies to all selected fields.');
         }
-        entry.recipe = { id: savedRecipe.id, name: savedRecipe.name };
+        entry.recipe = { id: savedRecipe.id, name: savedRecipe.name, snapshot: structuredClone(savedRecipe) };
       }
       await transaction(['settings'], 'readwrite', tx => {
         tx.objectStore('settings').add({ key: prefix + entry.id, value: entry });
