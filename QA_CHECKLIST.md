@@ -67,3 +67,6 @@ Run `node tests/field-plan-check.cjs` with Node 18 or later. The checks use synt
 
 - [x] Simulated fresh-device JSON recovery validates the roster, preserves annual settings and note IDs, and writes all three in one transaction. Duplicate fields, orphan notes, roster mismatch, and a concurrent initialization are rejected. Existing synthetic planner/spray/cache checks passed.
 - [ ] Verify a real offline restore on desktop and iPad using an isolated no-roster test shell. Workspace Chromium cannot open a process socket here. Live Supabase was not exercised.
+
+- [x] Mock private roster provisioning requires an account, filters by owner, rejects missing rows and account drift during provisioning, then reloads from the local roster.
+- [ ] Exercise account isolation and private roster provisioning against a synthetic test backend before enabling the roster-free shell. Real-device recovery testing deferred at user direction.
