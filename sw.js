@@ -1,5 +1,5 @@
-/* Field Scout V7.3.0 test: scope-specific offline cache. */
-const CACHE='field-scout-v7-3-0-foundation';
+/* Field Scout V7.3.1 reliability preview: scope-specific offline cache. */
+const CACHE='field-scout-v7-3-1-reliability-preview';
 const PRECACHE=['./','./index.html','./manifest.webmanifest'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(PRECACHE)));
