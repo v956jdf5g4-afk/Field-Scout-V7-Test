@@ -14,6 +14,8 @@ const configuredKey = /^const KEY='([^']+)';$/m;
 const roster = /^const fields=\[.*\];$/m;
 const farmers = /const farmerNames=\{[^\n]*?\};/;
 const {FIELD_SCOUT_QA_URL, FIELD_SCOUT_QA_PUBLIC_KEY} = process.env;
+const sample = process.argv.includes('--sample');
+assert.ok(!sample || !FIELD_SCOUT_QA_URL, 'Sample build must remain cloud-disabled');
 assert.equal(Boolean(FIELD_SCOUT_QA_URL), Boolean(FIELD_SCOUT_QA_PUBLIC_KEY),
   'Provide both the isolated QA origin and publishable key, or neither.');
 for (const marker of [configuredURL, configuredKey, roster, farmers]) {
@@ -35,13 +37,13 @@ if (FIELD_SCOUT_QA_URL) {
 }
 
 const html = source
-  .replace(roster, 'const fields=[];')
-  .replace(farmers, "const farmerNames={SAMPLE:'Sample Farmer'};")
+  .replace(roster, sample ? 'const fields=[["TEST1","Sample North",80,"Corn","SAMPLE"],["TEST2","Sample South",40,"Corn","SAMPLE"],["TEST3","Sample Wheat",65,"Spring wheat","SAMPLE2"],["TEST4","Sample Soybeans",55,"Soybeans","SAMPLE2"]];' : 'const fields=[];')
+  .replace(farmers, "const farmerNames={SAMPLE:'Sample Farmer',SAMPLE2:'Second Sample Farmer'};")
   .replace(configuredURL, () => 'const URL=' + JSON.stringify(endpoint) + ';')
   .replace(configuredKey, () => 'const KEY=' + JSON.stringify(publicKey) + ';')
   .replace("if(client||initializingCloud||!navigator.onLine)return;",
     "if(!URL){status('Cloud disabled for this synthetic build.');return}\n if(client||initializingCloud||!navigator.onLine)return;")
-  .replaceAll('FieldScoutOfflineV7Test', 'FieldScoutPrivateRosterQA-v1')
+  .replaceAll('FieldScoutOfflineV7Test', 'FieldScoutPrivateRosterQA-v2')
   .replaceAll('FieldScoutV7RecoverySnapshots', 'FieldScoutPrivateRosterQA-Snapshots-v1')
   .replaceAll('fieldscout_prototype_notes_v1', 'fieldscout_private_roster_qa_notes_v1')
   .replaceAll('fieldscout_v4_plan', 'fieldscout_private_roster_qa_plan_v1')
@@ -59,12 +61,13 @@ manifest.name = 'Field Scout Private Roster QA';
 manifest.short_name = 'Roster QA';
 delete manifest.icons;
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'field-scout-roster-qa-'));
-const worker = read('sw.js').replace(/const CACHE = PREFIX \+ '[^']+';/, "const CACHE = PREFIX + 'private-roster-qa-v2';");
+const worker = read('sw.js').replace(/const CACHE = PREFIX \+ '[^']+';/, "const CACHE = PREFIX + 'private-roster-qa-rc1';");
 for (const [file, contents] of Object.entries({
   'index.html': html,
   'field-plan.js': read('field-plan.js'),
   'farmer-notes.js': read('farmer-notes.js'),
   'fertilizer-blend.js': read('fertilizer-blend.js'),
+  'fertility-recommendations.js': read('fertility-recommendations.js'),
   'fertility-ui.js': read('fertility-ui.js'),
   'manifest.webmanifest': JSON.stringify(manifest, null, 2),
   'sw.js': worker,
