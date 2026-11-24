@@ -9,7 +9,7 @@ Status: Design review. NO application, Supabase, production, or live user-data c
 - GitHub Pages serves the HTML to anyone. A client-side opening password does not conceal its source.
 - `annualForYear` uses this literal roster as the 2026 baseline; `identityForYear` layers corrections over it. Simply deleting the array would break historical field lookups and year defaults.
 - JSON full-device backup and recovery snapshots include `staticFields:fields`. Any migration must preserve compatibility with already downloaded backups.
-- Settings are synchronized through the `field_scout_sync` table and `field_scout_save` RPC. The actual database RLS, table policies and RPC security configuration have NOT been independently verified.
+- Settings are synchronized through the `field_scout_sync` table and `field_scout_save` RPC. The user has now inspected the database RLS policies and RPC configuration in Supabase. The observed table policies are owner-scoped for authenticated users (SELECT, INSERT, UPDATE, DELETE), but no adversarial permission tests have been run.
 - The repository is public, and previously published commits remain accessible even after a new release removes the roster.
 
 ## Non-negotiable preservation
@@ -54,3 +54,12 @@ F. Update CHANGELOG, QA_CHECKLIST, and SOP with commit, test evidence, risks. Pr
 
 ## Current result
 Only this review/design document was added on a separate TEST repository branch. No application changes, database writes, migration, production updates, or device tests were performed. Next action: obtain **redacted** Supabase policy/schema/RPC definitions for a targeted authorization review.
+
+## Review update — user confirmation and Supabase screenshots (2026-11-23)
+- User confirmed the **farmer names, field names, field IDs and acreages are real** and must be preserved. Scouting notes, recipes and spray orders are disposable test entries, but do not delete them automatically.
+- User elected not to download another JSON backup because the notes/orders are test data. This is **not** permission to delete or reset roster, annual data or cloud records. Retain independent migration snapshot/checksum before any write; current public source is not a sufficient recovery strategy for device-specific annual edits.
+- Supabase UI showed `field_scout_sync` with RLS enabled; four authenticated policies use `auth.uid() = user_id` for SELECT, INSERT, UPDATE (USING and WITH CHECK) and DELETE. These are configuration observations, not a penetration test.
+- User supplied `field_scout_save` body: requires `auth.uid()`, sets `user_id` from the session, uses optimistic revision matching and raises on conflicts.
+- Read-only `pg_proc` query showed function owner `postgres`, SECURITY DEFINER true, explicit empty search_path, EXECUTE grants to `postgres` and `authenticated`. Elevated privileges still warrant checking grants, constraints, and actual anonymous/cross-account behavior before migrating.
+- The existing revision check permits expected revision 0 to update a row whose revision is 0; verify constraints and avoid claiming exhaustive correctness.
+- **No actual roster migration, cloud writes, code deployment or device acceptance testing has happened.** Before the first roster migration, require a private, non-public roster export that includes effective annual/identity overrides, count and ID verification, and a tested rollback path.
