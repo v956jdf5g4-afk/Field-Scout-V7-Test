@@ -865,6 +865,31 @@ else report('Offline — notes are saved on this device; cloud will retry when c
  const restoreFile=$('fsFullRestoreFile'),preview=$('fsFullRestorePreview'),confirmRestore=$('fsFullRestoreConfirm'),restoreStatus=$('fsFullRestoreStatus');
  const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
  function checkFullBackup(data){
+ function validatePlanningBackupSetting(item, rosterIds){
+  const k=item.key,v=item.value;
+  const id=x=>typeof x==='string'&&x.length>0&&x.length<=250;
+  const year=x=>Number.isInteger(x)&&x>=1900&&x<=2200;
+  const field=x=>id(x)&&rosterIds.has(x);
+  const positive=x=>typeof x==='number'&&Number.isFinite(x)&&x>0;
+  const pass=x=>x===undefined||(Number.isInteger(x)&&x>=1&&x<=20);
+  const ids=x=>Array.isArray(x)&&x.every(id);
+  const basic=()=>v&&typeof v==='object'&&id(v.id)&&k.endsWith(':'+v.id)&&typeof v.createdAt==='string';
+  let valid=true;
+  if(k.startsWith('field-plan-v1:')){
+   valid=basic()&&year(v.year)&&pass(v.pass)&&['herbicide','prepay','fall','strip','broadcast','preemerge','postemerge','starter','otherfert'].includes(v.type)&&['planned','needed','reported'].includes(v.state)&&typeof v.text==='string'&&Array.isArray(v.targets)&&v.targets.length>0&&v.targets.every(t=>field(t.fieldId)&&positive(t.acres)&&ids(t.previous));
+  }else if(k.startsWith('farmer-note-v1:')){
+   valid=basic()&&(v.kind==='complete'?id(v.noteId):v.kind==='note'&&id(v.farmer)&&typeof v.text==='string'&&typeof v.date==='string'&&(!v.year||year(v.year))&&(!v.fieldIds||Array.isArray(v.fieldIds)&&v.fieldIds.every(field)));
+  }else if(k.startsWith('fertility-v1:')){
+   valid=basic()&&['soil','recommendation','blend'].includes(v.kind)&&v.ctx&&field(v.ctx.fieldId)&&year(v.ctx.year)&&positive(v.ctx.acres)&&
+     (v.kind==='soil'?Array.isArray(v.values):v.kind==='recommendation'?v.recommendation&&typeof v.recommendation.version==='string':pass(v.passNumber)&&v.calculation&&Array.isArray(v.calculation.rows)&&(!v.previous||ids(v.previous)));
+  }else if(k.startsWith('fertility-product-v1:')){
+   valid=basic()&&typeof v.name==='string'&&['N','P2O5','K2O','S'].every(n=>typeof v[n]==='number'&&Number.isFinite(v[n])&&v[n]>=0&&v[n]<=100);
+  }else if(k.startsWith('plan-order-v1:')){
+   valid=basic()&&v.data&&year(v.data.year)&&Array.isArray(v.data.groups)&&v.data.groups.length>0&&v.data.groups.every(g=>Array.isArray(g.fields)&&g.fields.every(f=>field(f.id)&&positive(f.acres)))&&Array.isArray(v.links)&&v.links.every(l=>field(l.fieldId)&&id(l.planId));
+  }
+  if(!valid)throw Error('Invalid planning/contact/fertility record in backup: '+k);
+ }
+
   if(!data||data.format!=='FieldScoutV71FullDeviceBackup'||data.version!==1)throw Error('Not a supported full-device backup. Use the JSON from Download full-device backup.');
   if(!Array.isArray(data.notes)||!Array.isArray(data.settings)||!Array.isArray(data.staticFields))throw Error('Missing notes, settings or field list.');
   if(data.notes.length>100000||data.settings.length>20000||data.staticFields.length>10000)throw Error('Backup exceeds supported limits.');
@@ -872,7 +897,7 @@ else report('Offline — notes are saved on this device; cloud will retry when c
   if(fields.length&&!same(data.staticFields,fields))throw Error('Field list differs from this app version. No changes made; review the backup before restoring.');
   const ids=new Set(),keys=new Set();
   for(const note of data.notes){if(!validRecord(note,rosterIds)||ids.has(note.id))throw Error('Invalid or duplicate scouting note in backup.');ids.add(note.id)}
-  for(const item of data.settings){if(!item||typeof item.key!=='string'||!item.key||[restoredRosterKey,rosterOwnerKey].includes(item.key)||item.key.length>250||!Object.prototype.hasOwnProperty.call(item,'value')||keys.has(item.key))throw Error('Invalid or duplicate setting in backup.');keys.add(item.key)}
+  for(const item of data.settings){if(!item||typeof item.key!=='string'||!item.key||[restoredRosterKey,rosterOwnerKey].includes(item.key)||item.key.length>250||!Object.prototype.hasOwnProperty.call(item,'value')||keys.has(item.key))throw Error('Invalid or duplicate setting in backup.');keys.add(item.key);validatePlanningBackupSetting(item,rosterIds)}
   return data;
  }
  function restoreFullBackup(data){
