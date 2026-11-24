@@ -63,3 +63,9 @@ Only this review/design document was added on a separate TEST repository branch.
 - Read-only `pg_proc` query showed function owner `postgres`, SECURITY DEFINER true, explicit empty search_path, EXECUTE grants to `postgres` and `authenticated`. Elevated privileges still warrant checking grants, constraints, and actual anonymous/cross-account behavior before migrating.
 - The existing revision check permits expected revision 0 to update a row whose revision is 0; verify constraints and avoid claiming exhaustive correctness.
 - **No actual roster migration, cloud writes, code deployment or device acceptance testing has happened.** Before the first roster migration, require a private, non-public roster export that includes effective annual/identity overrides, count and ID verification, and a tested rollback path.
+
+## Development checkpoint — 2026-11-23
+- Added `roster-store.js`: standalone, data-free baseline roster validation, snapshot format, IndexedDB-settings adapter interface, and no-silent-overwrite reconciliation. It is **not referenced by index.html** and therefore does not affect the running app.
+- Added `tests/roster-store.test.cjs` with synthetic cases for duplicate IDs, invalid acres, 2026 baseline, offline cache, unchanged roster, and remote conflict protection. Tests are **written but not yet executed** in a Node runtime.
+- Branch head at time of checkpoint: `f1d6db2a6c3db5b488f7feadf10d34f0c2a09eb2`. No production or test app deployment, Supabase schema change, cloud write, or real-device QA.
+- Still required: private transfer of roster and existing annual/identity settings, verified RLS and RPC permissions, transactional migration and rollback, integration into app startup/backup/sync, service worker upgrade, and on-device acceptance. **Do not merge or deploy the current draft.**
