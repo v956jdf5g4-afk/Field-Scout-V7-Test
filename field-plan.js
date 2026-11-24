@@ -3,6 +3,8 @@
   const prefix = 'field-plan-v1:';
   const types = {
     herbicide: 'Herbicide program',
+    preemerge: 'Pre-emergence herbicide',
+    postemerge: 'Post-emergence herbicide',
     prepay: 'Chemical prepay',
     fall: 'Fall herbicide',
     strip: 'Strip-till fertilizer',
@@ -32,7 +34,7 @@
       <label>Status <select id="fpState"></select></label>
       <label id="fpWorkLabel" hidden>Reported work date (optional) <input id="fpWork" type="date"></label>
       <label>Plan or report details <textarea id="fpText" required maxlength="2000" rows="3"></textarea></label>
-      <label id="fpRecipeLabel" hidden>Spray recipe (optional) <select id="fpRecipe"></select></label>
+      <div id="fpPrepay" hidden><label>Prepaid product <input id="fpPrepayProduct" maxlength="120"></label><label>Farmer-reported total quantity for selected fields <input id="fpPrepayQty" type="number" min="0" step="any"></label><label>Unit <select id="fpPrepayUnit"><option value="gal">gal</option><option value="lb">lb</option><option value="qt">qt</option><option value="pt">pt</option><option value="fl oz">fl oz</option><option value="oz wt">oz wt</option></select></label><small>One shared total, not a quantity per field. Prepaid does not mean applied.</small></div><label id="fpRecipeLabel" hidden>Spray recipe (optional) <select id="fpRecipe"></select></label>
       <button type="submit" id="fpSave">Save to selected fields</button>
     </form>
     <p id="fpStatus" role="status"></p>`;
@@ -51,13 +53,14 @@
   }
 
   function stateOptions() {
-    const isWork = ['fall', 'strip', 'broadcast'].includes(type.value);
+    const isWork = ['fall', 'strip', 'broadcast', 'preemerge', 'postemerge'].includes(type.value);
     const options = Object.entries(states).filter(([key]) => isWork || key === 'planned');
     replaceOptions(state, options.map(([key, label]) => option(key, label)));
     $('fpWorkLabel').hidden = state.value !== 'reported';
     work.disabled = $('fpWorkLabel').hidden;
-    $('fpRecipeLabel').hidden = !['herbicide', 'fall'].includes(type.value);
+    $('fpRecipeLabel').hidden = !['herbicide', 'fall', 'preemerge', 'postemerge'].includes(type.value);
     recipe.disabled = $('fpRecipeLabel').hidden;
+    $('fpPrepay').hidden = type.value !== 'prepay';
   }
 
   function matchingFields() {
@@ -75,7 +78,7 @@
 
   function describe(entry) {
     const status = states[entry.state] || entry.state;
-    return status + ' · ' + entry.text + (entry.recipe ? ' · Recipe: ' + entry.recipe.name : '') +
+    return status + ' · ' + entry.text + (entry.prepay ? ' · Shared batch prepay: ' + entry.prepay.quantity + ' ' + entry.prepay.unit + ' ' + entry.prepay.product + ' across ' + entry.targets.length + ' field(s)' : '') + (entry.recipe ? ' · Recipe: ' + entry.recipe.name : '') +
       (entry.workDate ? ' · Work date: ' + entry.workDate : '') + ' · Entered ' + new Date(entry.createdAt).toLocaleString();
   }
 
@@ -154,6 +157,7 @@
     for (const input of panel.querySelectorAll('input[type=checkbox]:enabled')) input.checked = true;
   };
   window.addEventListener('fieldscout:field-context', () => { void render(); });
+  window.addEventListener('fieldscout:settings-downloaded', () => { void render(); });
   $('fpForm').onsubmit = async event => {
     event.preventDefault();
     if (savingBatch || save.disabled || lastYear !== cropYear) return;
@@ -173,6 +177,16 @@
       id: crypto.randomUUID(), year, targets, text, type: type.value, state: state.value,
       createdAt: new Date().toISOString(), workDate: work.disabled ? '' : work.value
     };
+    if (type.value === 'prepay') {
+      const product=$('fpPrepayProduct').value.trim(), raw=$('fpPrepayQty').value;
+      if(product || raw !== '') {
+        const quantity=Number(raw);
+        if(!product || raw === '' || !Number.isFinite(quantity) || quantity < 0) {
+          $('fpStatus').textContent='Enter both prepaid product and a valid total quantity.';return;
+        }
+        entry.prepay={product,quantity,unit:$('fpPrepayUnit').value,scope:'batch-total'};
+      }
+    }
     if (!confirm('Save this ' + year + ' update to ' + targets.length + ' field(s)?')) return;
     savingBatch = true;
     save.disabled = true;
