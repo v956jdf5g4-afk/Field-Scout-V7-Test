@@ -77,3 +77,10 @@ Run `node tests/private-roster-supabase.cjs` with an isolated Supabase origin, p
 
 - [x] Runner syntax and missing-configuration guard checked. Existing simulated roster, recovery, planning and cache checks passed.
 - [ ] Live run needs the isolated Supabase project and disposable sessions. Device recovery remains deferred.
+
+### Roster-free QA shell
+
+Run `node scripts/build-private-roster-qa.cjs` to generate an isolated QA bundle in a temporary directory. Host it only on a separate QA origin so its service worker cannot control either existing app. The default build disables cloud initialization. To exercise signed-in provisioning, configure `FIELD_SCOUT_QA_URL` and `FIELD_SCOUT_QA_PUBLIC_KEY` for an isolated Supabase project, then seed the reserved `v7-private-roster-v1` row for a disposable account with sample rows using operator code `SAMPLE`.
+
+- [x] Generated cloud-disabled and synthetic-endpoint builds. Inline JavaScript parses, existing mock and regression checks pass, and the configured app backend is rejected.
+- [ ] Live sign-in and roster loading need a separate Supabase project and disposable users. No existing app deployed or real roster migrated.
