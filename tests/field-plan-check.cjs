@@ -72,7 +72,7 @@ vm.runInNewContext(read('sw.js'),sandbox);
   let pending;
   handlers.install({waitUntil: promise=>{pending=promise}});
   await pending;
-  assert.ok(values.has('./field-plan.js?v=7.4.0-dev'));
+  for(const name of ['field-plan','farmer-notes','fertilizer-blend','fertility-recommendations','fertility-ui'])assert.ok(values.has('./'+name+'.js?v=7.4.0-rc1'));
   handlers.activate({waitUntil: promise=>{pending=promise}});
   await pending;
   assert.deepEqual(keys,['legacy','field-scout:https://local/production/:older']);
