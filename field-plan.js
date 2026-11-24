@@ -31,11 +31,11 @@
         <div id="fpFields"></div>
       </fieldset>
       <label>Plan or operation <select id="fpType"></select></label>
-      <label>Status <select id="fpState"></select></label>
+      <label>Pass / separate item <input id="fpPass" type="number" min="1" max="20" step="1" value="1" required></label><small>Use the same number to revise; a different number adds another pass or prepaid product.</small><label>Status <select id="fpState"></select></label>
       <label id="fpWorkLabel" hidden>Reported work date (optional) <input id="fpWork" type="date"></label>
       <label>Plan or report details <textarea id="fpText" required maxlength="2000" rows="3"></textarea></label>
       <div id="fpPrepay" hidden><label>Prepaid product <input id="fpPrepayProduct" maxlength="120"></label><label>Farmer-reported total quantity for selected fields <input id="fpPrepayQty" type="number" min="0" step="any"></label><label>Unit <select id="fpPrepayUnit"><option value="gal">gal</option><option value="lb">lb</option><option value="qt">qt</option><option value="pt">pt</option><option value="fl oz">fl oz</option><option value="oz wt">oz wt</option></select></label><small>One shared total, not a quantity per field. Prepaid does not mean applied.</small></div><label id="fpRecipeLabel" hidden>Spray recipe (optional) <select id="fpRecipe"></select></label>
-      <button type="submit" id="fpSave">Save to selected fields</button>
+      <label>Related farmer conversation (optional) <select id="fpContact"><option value="">None</option></select></label><button type="button" id="fpClear">Clear current entry</button><button type="submit" id="fpSave">Save to selected fields</button>
     </form>
     <p id="fpStatus" role="status"></p><h3>Generate spray order from selected plan</h3><p>Choose one crop, a chemical stage and confirmed fields. Current saved recipe snapshots are used; overlapping or completed plans must be reviewed. No application is reported by generating an order.</p><button type="button" id="fpPreviewOrder">Preview planned order</button><button type="button" id="fpSaveOrder" disabled>Save planned order snapshot</button><div id="fpOrderPreview"></div><h3>Saved plan orders</h3><div id="fpOrderHistory"></div>`;
   const review = $('yearReviewFields').closest('details') || $('yearReviewFields').parentElement;
@@ -43,7 +43,7 @@
 
   const farmer = $('fpFarmer'), crop = $('fpCrop'), type = $('fpType'), state = $('fpState');
   const work = $('fpWork'), note = $('fpText'), recipe = $('fpRecipe'), save = $('fpSave');
-  let lastYear, tickets = 0, savingBatch = false, displayedHeads = new Map(), previewOrder=null, savingOrder=false;
+  let draftScope=null,lastYear, tickets = 0, savingBatch = false, displayedHeads = new Map(), previewOrder=null, savingOrder=false;
   type.replaceChildren(...Object.entries(types).map(([key, label]) => option(key, label)));
 
   function replaceOptions(select, options) {
@@ -67,8 +67,8 @@
     return yearFields().filter(field => field[4] === farmer.value && (!crop.value || crop.value === field[3]));
   }
 
-  function historyFor(entries, id, category) {
-    return entries.filter(entry => entry.type === category && entry.targets?.some(target => target.fieldId === id));
+  function historyFor(entries, id, category, pass=1) {
+    return entries.filter(entry => entry.type === category && (entry.pass||1)===pass && entry.targets?.some(target => target.fieldId === id));
   }
 
   function headsFor(history, id) {
@@ -82,7 +82,7 @@
       (entry.workDate ? ' · Work date: ' + entry.workDate : '') + ' · Entered ' + new Date(entry.createdAt).toLocaleString();
   }
 
-  function fieldRow(field, entries, selected) {
+  function fieldRow(field, entries, selected, settings) {
     const [id, name, , fieldCrop] = field;
     const row = node('div');
     row.className = 'fp-row';
@@ -95,21 +95,31 @@
     const details = node('details');
     details.append(node('summary', 'Plan and history'));
     for (const [category, title] of Object.entries(types)) {
-      const history = historyFor(entries, id, category);
-      const heads = headsFor(history, id);
-      displayedHeads.set(id + ':' + category, heads.map(entry => entry.id));
-      if (!history.length) continue;
-      currentStatuses.push(title + ' · ' + (heads.length > 1 ? 'Review overlapping updates' : states[heads[0]?.state] || 'Review history'));
-      details.append(node('h4', title));
-      if (heads.length > 1) details.append(node('p', 'Overlapping updates. Review each entry and save a correction to set the current plan.'));
-      const list = node('ul');
-      for (const entry of history) {
-        const original = entry.targets.find(target => target.fieldId === id).previous.length === 0;
-        const marker = original ? 'Initial entry · ' : '';
-        const current = heads.includes(entry) ? (heads.length > 1 ? 'Needs review · ' : 'Current · ') : '';
-        list.append(node('li', current + marker + describe(entry)));
+      const passes=[...new Set(entries.filter(entry=>entry.type===category&&entry.targets?.some(t=>t.fieldId===id)).map(entry=>entry.pass||1))].sort((a,b)=>a-b);
+      for(const pass of passes){
+        const history=historyFor(entries,id,category,pass),heads=headsFor(history,id);
+        displayedHeads.set(id+':'+category+':'+pass,heads.map(entry=>entry.id));
+        currentStatuses.push(title+' #'+pass+' · '+(heads.length>1?'Review overlapping updates':states[heads[0]?.state]||'Review history'));
+        details.append(node('h4',title+' #'+pass));
+        if(heads.length>1)details.append(node('p','Overlapping updates. Review each entry and save a correction to set the current plan.'));
+        const list=node('ul');
+        for(const entry of history){
+          const original=entry.targets.find(t=>t.fieldId===id).previous.length===0;
+          const marker=(heads.includes(entry)?(heads.length>1?'Needs review · ':'Current · '):'')+(original?'Initial entry · ':'');
+          const li=node('li',marker+describe(entry));
+          if(entry.contactId){
+            const contact=settings.find(r=>r.key==='farmer-note-v1:'+entry.contactId)?.value;
+            if(contact){const related=node('details');related.append(node('summary','Related farmer conversation · '+contact.date),node('p',contact.text));li.append(related)}
+          }
+          list.append(li);
+        }
+        details.append(list);
       }
-      details.append(list);
+    }
+    const fertility=settings.filter(r=>r.key.startsWith('fertility-v1:')&&r.value?.ctx?.fieldId===id&&r.value.ctx.year===cropYear).map(r=>r.value);
+    if(fertility.length){
+      const counts=['soil','recommendation','blend'].map(k=>fertility.filter(r=>r.kind===k).length);
+      details.append(node('p','Fertility history: '+counts[0]+' soil tests, '+counts[1]+' recommendations, '+counts[2]+' blend records. Open Soil Tests & Fertilizer Blends for details.'));
     }
     if (details.children.length === 1) details.append(node('p', 'No plan entries for this crop year.'));
     row.append(details);
@@ -137,9 +147,12 @@
       const entries = settings.filter(item => item.key.startsWith(prefix) && item.value?.year === year)
         .map(item => item.value).sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
       const candidates = matchingFields();
+      const context=year+':'+farmer.value+':'+crop.value;
+      if(draftScope===null||!hasDraft())draftScope=context;
+      replaceOptions($('fpContact'),[option('','None'),...settings.filter(r=>r.key.startsWith('farmer-note-v1:')&&r.value?.kind==='note'&&r.value.farmer===farmer.value).map(r=>r.value).sort((a,b)=>b.date.localeCompare(a.date)).map(n=>option(n.id,n.date+' · '+(n.topic||n.text.slice(0,60))))]);
       replaceOptions(recipe, [option('', 'Choose recipe'), ...(recipes || []).filter(item => candidates.some(field => !item.crop || item.crop === field[3])).map(item => option(item.id, item.name))]);
       displayedHeads = new Map();
-      $('fpFields').replaceChildren(...candidates.map(field => fieldRow(field, entries, selected)));
+      $('fpFields').replaceChildren(...candidates.map(field => fieldRow(field, entries, selected, settings)));
       if (!candidates.length) $('fpFields').textContent = 'No fields match these filters.';
       lastYear = year;
       renderOrderHistory(settings,year);
@@ -148,33 +161,35 @@
       $('fpStatus').textContent = 'Could not read field plans. Reopen the panel to retry.';
       lastYear = null;
     } finally {
-      if (ticket === tickets) save.disabled = savingBatch || lastYear !== cropYear;
+      if (ticket === tickets) save.disabled = savingBatch || lastYear !== cropYear || draftScope!==cropYear+':'+farmer.value+':'+crop.value;
     }
   }
 
+  function hasDraft(){return !!(note.value.trim()||recipe.value||work.value||$('fpPrepayProduct').value||$('fpPrepayQty').value||$('fpContact').value)}
+  $('fpClear').onclick=()=>{if(hasDraft()&&!confirm('Clear unsaved plan entry?'))return;$('fpForm').reset();draftScope=cropYear+':'+farmer.value+':'+crop.value;void render()};
   function invalidatePreview(){
     previewOrder=null;$('fpSaveOrder').disabled=true;$('fpOrderPreview').replaceChildren();
   }
   function renderOrderHistory(settings,year){
     const list=$('fpOrderHistory');
     list.replaceChildren(...settings.filter(x=>x.key.startsWith('plan-order-v1:')&&x.value?.data?.year===year&&x.value.data.farmer===farmer.value).map(x=>x.value).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).map(o=>{
-      const d=node('details');d.append(node('summary',o.number+' · '+o.category+' · '+o.data.crop));
+      const d=node('details');d.append(node('summary',o.number+' · '+o.category+' #'+(o.pass||1)+' · '+o.data.crop));
       const report=node('div');report.innerHTML=window.fieldScoutPlanOrder.html(o.data);const print=node('button','Print / Save PDF');print.type='button';print.onclick=()=>window.fieldScoutPlanOrder.print(o.data);d.append(report,print);return d;
     }));if(!list.children.length)list.textContent='No saved plan orders for this farmer/year.';
   }
   async function prepareOrder(){
     invalidatePreview();if(!ready||lastYear!==cropYear||savingBatch)throw Error('Wait for plans to load.');
     if(!crop.value||!['herbicide','fall','preemerge','postemerge'].includes(type.value))throw Error('Choose a single crop and chemical stage.');
-    const year=cropYear,operator=farmer.value,fieldCrop=crop.value,category=type.value;
+    const year=cropYear,operator=farmer.value,fieldCrop=crop.value,category=type.value,pass=Number($('fpPass').value);if(!Number.isInteger(pass)||pass<1||pass>20)throw Error('Choose a valid pass number.');
     const checked=[...panel.querySelectorAll('#fpFields input[type=checkbox]:checked')].map(i=>i.value);
     if(!checked.length)throw Error('Select fields for this order.');
     const settings=await getAll('settings');
-    if(year!==cropYear||operator!==farmer.value||fieldCrop!==crop.value||category!==type.value||checked.join('|')!==[...panel.querySelectorAll('#fpFields input[type=checkbox]:checked')].map(i=>i.value).join('|'))throw Error('Selection changed; preview again.');
+    if(year!==cropYear||operator!==farmer.value||fieldCrop!==crop.value||category!==type.value||pass!==Number($('fpPass').value)||checked.join('|')!==[...panel.querySelectorAll('#fpFields input[type=checkbox]:checked')].map(i=>i.value).join('|'))throw Error('Selection changed; preview again.');
     const all=settings.filter(r=>r.key.startsWith(prefix)&&r.value?.year===year).map(r=>r.value);
     const recipes=Object.create(null),links=[];
     for(const id of checked){
       if(!fieldYearConfirmed(id))throw Error(id+' is not confirmed.');
-      const h=headsFor(historyFor(all,id,category),id);
+      const h=headsFor(historyFor(all,id,category,pass),id);
       if(h.length!==1||h[0].state==='reported'||!h[0].recipe?.snapshot)throw Error(id+': needs one current, incomplete plan with a saved recipe snapshot. Resave legacy recipe links.');
       const r=h[0].recipe.snapshot;
       if(!r.id||!Array.isArray(r.lines)||!r.lines.length||!Number.isFinite(Number(r.gpa))||Number(r.gpa)<=0||r.lines.some(l=>!l.name||!Number.isFinite(Number(l.rate))||Number(l.rate)<=0||!['fl oz/ac','pt/ac','qt/ac','gal/ac','oz wt/ac','lb/ac','fl oz/100 gal','pt/100 gal','qt/100 gal','gal/100 gal','oz wt/100 gal','lb/100 gal'].includes(l.unit)))throw Error(id+': invalid recipe snapshot.');
@@ -182,7 +197,7 @@
     }
     const data=window.fieldScoutPlanOrder.calculate({farmer:operator,crop:fieldCrop,recipes});
     if(data.groups.reduce((n,g)=>n+g.fields.length,0)!==checked.length)throw Error('Some fields could not be included. Review crop and recipe assignments.');
-    previewOrder={data,links,category};$('fpOrderPreview').innerHTML=window.fieldScoutPlanOrder.html(data);$('fpSaveOrder').disabled=savingOrder;
+    previewOrder={data,links,category,pass};$('fpOrderPreview').innerHTML=window.fieldScoutPlanOrder.html(data);$('fpSaveOrder').disabled=savingOrder;
   }
   $('fpPreviewOrder').onclick=async()=>{try{await prepareOrder()}catch(e){$('fpStatus').textContent=e.message}};
   $('fpSaveOrder').onclick=async()=>{
@@ -195,7 +210,7 @@
   };
   panel.addEventListener('change',e=>{if(e.target.closest('#fpForm')||e.target===farmer||e.target===crop)invalidatePreview()});
   panel.addEventListener('toggle', () => { void render(); });
-  farmer.onchange = crop.onchange = () => { void render(); };
+  farmer.onchange = crop.onchange = () => { if(hasDraft())$('fpStatus').textContent='Unsaved entry belongs to the previous farmer/crop/year. Return to that selection or clear the entry.';void render(); };
   type.onchange = state.onchange = stateOptions;
   $('fpSelectAll').onclick = () => {
     for (const input of panel.querySelectorAll('#fpFields input[type=checkbox]:enabled')) input.checked = true;
@@ -205,13 +220,14 @@
   window.addEventListener('fieldscout:settings-downloaded', () => { void render(); });
   $('fpForm').onsubmit = async event => {
     event.preventDefault();
-    if (savingBatch || save.disabled || lastYear !== cropYear) return;
+    if (savingBatch || save.disabled || lastYear !== cropYear || draftScope!==cropYear+':'+farmer.value+':'+crop.value) return;
+    const pass=Number($('fpPass').value);if(!Number.isInteger(pass)||pass<1||pass>20){$('fpStatus').textContent='Choose a pass or item number between 1 and 20.';return}
     const year = cropYear;
     const selected = [...panel.querySelectorAll('input[type=checkbox]:checked')].map(input => input.value);
     const targets = matchingFields().filter(field => selected.includes(field[0]) && fieldYearConfirmed(field[0]))
       .map(([fieldId, name, acres, fieldCrop, operator]) => ({
         fieldId, name, acres, crop: fieldCrop, operator,
-        previous: displayedHeads.get(fieldId + ':' + type.value) || []
+        previous: displayedHeads.get(fieldId + ':' + type.value + ':' + pass) || []
       }));
     const text = note.value.trim(), recipeId = recipe.disabled ? '' : recipe.value;
     if (!targets.length || !text) {
@@ -219,7 +235,7 @@
       return;
     }
     const entry = {
-      id: crypto.randomUUID(), year, targets, text, type: type.value, state: state.value,
+      id: crypto.randomUUID(), year, targets, text, type: type.value, pass, contactId:$('fpContact').value||null, state: state.value,
       createdAt: new Date().toISOString(), workDate: work.disabled ? '' : work.value
     };
     if (type.value === 'prepay') {
@@ -246,14 +262,14 @@
       await transaction(['settings'], 'readwrite', tx => {
         tx.objectStore('settings').add({ key: prefix + entry.id, value: entry });
       });
-      if (note.value.trim() === text) note.value = '';
+      if (note.value.trim() === text) {note.value = '';recipe.value='';work.value='';$('fpPrepayProduct').value='';$('fpPrepayQty').value='';$('fpContact').value=''}
       $('fpStatus').textContent = 'Saved on this device for ' + targets.length + ' field(s) in ' + year + '.';
       await render();
     } catch (error) {
       $('fpStatus').textContent = 'Could not save: ' + error.message;
     } finally {
       savingBatch = false;
-      save.disabled = lastYear !== cropYear;
+      save.disabled = lastYear !== cropYear || draftScope!==cropYear+':'+farmer.value+':'+crop.value;
     }
   };
   stateOptions();
