@@ -42,3 +42,18 @@ Use only the V7 Test app. Existing test records can stay until a coordinated cle
 - Clean installation on iPad and computer; service-worker offline reload and version upgrade.
 - Full backup/restore from a safe, isolated environment.
 - Removing all test data from both local devices and the cloud without repopulation.
+## V7.4.0-dev Field Plan review
+
+Run `node tests/field-plan-check.cjs` with Node 18 or later. The checks use synthetic records and a simulated service-worker cache.
+
+- [x] Node check. Two updates from the same prior entry retain both branches. A correction can supersede both, and another field in the original batch retains its own history.
+- [x] Node check. An 80-acre synthetic order combines liquid and weight rates per acre and per 100 gallons. Expected 13.25 gal in 6 containers of 2.5 gal and 50.6 lb in 3 packages of 25 lb. An unconfirmed 20-acre field is excluded. Computed recipe and acres survive later edits to their inputs.
+- [x] Simulated cache check. Planner script is precached, navigation falls back to cached HTML offline, and cleanup leaves other installation scopes alone.
+- [ ] In an isolated test browser, open Planning and save one herbicide program for two confirmed fields. Revise only one field. Confirm first and latest entries, and confirm the second field retains its original program.
+- [ ] Leave one 2027 field unconfirmed and confirm another. Verify only the latter is selectable. Record a farmer-reported 2026 fall work date against a 2027 plan. Compare both years.
+- [ ] Reopen after disconnecting on desktop and iPad. Save a strip-till or broadcast update offline. Reconnect to a verified test account and confirm it syncs to the other device.
+- [ ] Make overlapping updates to the same operation on both devices while offline. Sync, review both entries, save a correction and verify it appears on both devices.
+- [ ] Export full-device JSON. Verify the plan batches are present and restore offline in an isolated browser. Verify plan, field year, recipe link, and original history. Verify older backup compatibility.
+- [ ] Verify settings pagination across more than one server page and validate row-level policies and save-RPC authorization for signed-out, owner, and non-owner accounts with synthetic data.
+- [ ] Verify clean install and upgrade from V7.3.0. Check cached data and unsynced records. Confirm the old backup commands are hidden and CSV/full-device backup still work.
+- [ ] Check per-field spray quantities and printed saved order after source edits. Current report presentation groups line totals by recipe, rounds displayed quantities to three decimal places and uses the first encountered packaging size for a product. Resolve package preference and reporting detail before production use.

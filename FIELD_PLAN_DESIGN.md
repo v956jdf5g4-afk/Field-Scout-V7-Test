@@ -29,3 +29,14 @@ Purpose: one consultant's offline-first field management tool, not a public farm
 ## Principle
 
 The answer to **What was planned? What has been done? What remains?** should be available in one or two taps, including when offline.
+## V7.4.0-dev implementation on the review branch
+
+Planning has a combined Field Plan. Each save is a single additive settings record with an ID, target crop year, field snapshots, entry type, status, text, time entered, optional farmer-reported work date and optional existing spray recipe reference. Prepay is recorded as a planning note. Saving never changes a spray assignment or order. Revisions identify predecessor entries independently for each field and operation, so overlapping updates are visible instead of silently replaced. Each category represents one current program or operation summary per field/year. Multiple passes within a category and a structured prepay quantity editor are future work.
+
+The existing full-device JSON includes all plan settings. The existing authenticated settings sync is the intended transport, pending live verification. Rollback before deployment is to keep the review branch unmerged. After a future deployment, export full-device JSON and preserve the additive records if rolling back the app shell. The earlier shell cannot display Field Plans. Preserve records and test restoration before any data cleanup.
+
+### P0 privacy gate
+
+The existing public app shell still contains the roster. It should move to owner-authorized storage and be cached on this device after authenticated setup or provisioned from a verified local backup. Keep stable field IDs and preserve the baseline year, note links and historical snapshots. Audit Supabase table policies, grants and the save RPC before consenting to use real plan data. Test owner and non-owner behavior with synthetic data. Inventory old Pages artifacts, public Git history, and caches separately since changing the current shell does not retract earlier copies. Confirm offline startup on a configured iPad and first-time setup in an empty browser before switching the roster source. See the official Supabase guide at https://supabase.com/docs/guides/database/postgres/row-level-security.
+
+Farmer Notes, supported soil-test recommendations and blend math remain approved future work. Keep those records out of the static bundle and validate recommendations against applicable extension source examples before use.

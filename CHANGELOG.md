@@ -21,3 +21,12 @@ Starting point: the user-provided V7.2.5 HTML, retaining existing database name 
 - No production GitHub deployments or Supabase database migration were performed.
 - Not a comprehensive offline/sync security audit. App still embeds farmer/field information in public site source.
 - Chemical/fertilizer Field Plan, reported fall herbicides, farmer completion checkbox and post-spray revisit are future design work, not enabled in this release.
+## V7.4.0-dev — Field Plan review branch
+
+Built against the V7.3.0 foundation commit `1587988cd03d17a3b2146824e47356698c19542f`.
+
+- Added a crop-year Field Plan under Planning. Batch entries by farmer and crop, with confirmed field selection, herbicide revisions, free-text prepay, fall herbicide, strip-till, broadcast and farmer-reported status. Optional links retain the spray recipe ID and display name at save time.
+- Plans use additive settings records, with no IndexedDB schema upgrade. Concurrent revisions retain both entries and show overlapping updates per field and operation until a correction is saved.
+- Added settings pagination by record key, clarified daily snapshot wording, and scoped the new offline cache to the install path. Hid the older scouting-only backup/import controls. Full-device JSON and CSV remain available.
+- Node checks passed for plan history and overlapping revisions, synthetic mixed-unit spray totals and package rounding, frozen calculation inputs and simulated service-worker caching. Browser launch in the workspace was blocked. Live Supabase policy and sync, iPad and desktop offline behavior, and full restore are pending.
+- Review branch only. Roster migration, fertilizer calculator, Farmer Notes and spray order generation from the plan remain planned.
