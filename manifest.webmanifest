@@ -1,6 +1,6 @@
 {
-  "name": "Field Scout V7 Foundation Test",
-  "short_name": "Scout V7 Test",
+  "name": "Field Scout V7.4.0-rc1 Review",
+  "short_name": "Scout V7.4 RC",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

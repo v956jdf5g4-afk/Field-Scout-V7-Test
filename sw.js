@@ -1,28 +1,42 @@
-/* Field Scout V7.3.0 test: scope-specific offline cache. */
-const CACHE='field-scout-v7-3-0-foundation';
-const PRECACHE=['./','./index.html','./manifest.webmanifest'];
-self.addEventListener('install',event=>{
-  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(PRECACHE)));
-  self.skipWaiting();
+/* Field Scout 7.4.0 development build. Cache entries belong to this installation path. */
+const PREFIX = 'field-scout:' + self.registration.scope + ':';
+const CACHE = PREFIX + '7.4.0-rc1';
+const PRECACHE = ['./', './index.html', './manifest.webmanifest', './field-plan.js?v=7.4.0-rc1', './farmer-notes.js?v=7.4.0-rc1', './fertilizer-blend.js?v=7.4.0-rc1', './fertility-recommendations.js?v=7.4.0-rc1', './fertility-ui.js?v=7.4.0-rc1'];
+
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(PRECACHE)));
 });
-self.addEventListener('activate',event=>{
-  event.waitUntil(Promise.all([
-    caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('field-scout-')&&k!==CACHE).map(k=>caches.delete(k)))),
-    self.clients.claim()
-  ]));
+
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key.startsWith(PREFIX) && key !== CACHE).map(key => caches.delete(key)));
+    await self.clients.claim();
+  })());
 });
-self.addEventListener('fetch',event=>{
-  const request=event.request;
-  if(request.method!=='GET'||new URL(request.url).origin!==self.location.origin)return;
-  if(request.mode==='navigate'){
-    event.respondWith(fetch(request).then(response=>{
-      if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(request,copy)))}
-      return response;
-    }).catch(async()=>await caches.match(request)||await caches.match('./index.html')));
+
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  if (request.method !== 'GET' || !request.url.startsWith(self.registration.scope)) return;
+  if (request.mode === 'navigate') {
+    event.respondWith((async () => {
+      const cache = await caches.open(CACHE);
+      try {
+        const response = await fetch(request);
+        if (response.ok) await cache.put(request, response.clone()).catch(() => {});
+        return response;
+      } catch {
+        return await cache.match(request) || await cache.match('./index.html') || Response.error();
+      }
+    })());
     return;
   }
-  event.respondWith(caches.match(request).then(cached=>cached||fetch(request).then(response=>{
-    if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(request,copy)))}
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    const response = await fetch(request);
+    if (response.ok) await cache.put(request, response.clone()).catch(() => {});
     return response;
-  })));
+  })());
 });

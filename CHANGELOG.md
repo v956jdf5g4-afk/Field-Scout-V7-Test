@@ -21,3 +21,31 @@ Starting point: the user-provided V7.2.5 HTML, retaining existing database name 
 - No production GitHub deployments or Supabase database migration were performed.
 - Not a comprehensive offline/sync security audit. App still embeds farmer/field information in public site source.
 - Chemical/fertilizer Field Plan, reported fall herbicides, farmer completion checkbox and post-spray revisit are future design work, not enabled in this release.
+## V7.4.0-dev — Field Plan review branch
+
+Built against the V7.3.0 foundation commit `1587988cd03d17a3b2146824e47356698c19542f`.
+
+- Added a crop-year Field Plan under Planning. Batch entries by farmer and crop, with confirmed field selection, herbicide revisions, free-text prepay, fall herbicide, strip-till, broadcast and farmer-reported status. Optional links retain the spray recipe ID and display name at save time.
+- Plans use additive settings records, with no IndexedDB schema upgrade. Concurrent revisions retain both entries and show overlapping updates per field and operation until a correction is saved.
+- Added settings pagination by record key, clarified daily snapshot wording, and scoped the new offline cache to the install path. Hid the older scouting-only backup/import controls. Full-device JSON and CSV remain available.
+- Node checks passed for plan history and overlapping revisions, synthetic mixed-unit spray totals and package rounding, frozen calculation inputs and simulated service-worker caching. Browser launch in the workspace was blocked. Live Supabase policy and sync, iPad and desktop offline behavior, and full restore are pending.
+- Review branch only. Roster migration, fertilizer calculator, Farmer Notes and spray order generation from the plan remain planned.
+
+### Offline roster recovery (draft)
+
+Full-device JSON can initialize an empty local roster with the backup’s validated field rows, notes and settings in one IndexedDB transaction. Stored rosters reload locally. An initialized installation still requires a matching roster. No cloud schema change or deployment. Rollback before merge is to revert this draft change.
+
+### Authenticated roster loading (draft)
+
+A roster-free shell can read its signed-in account’s pre-provisioned roster, validate it, and store it locally for offline access. Normal sync waits for successful provisioning. Existing bundled-roster behavior stays in place pending migration. No cloud row was created and no app was deployed. Revert the draft commits to roll back.
+
+## V7.4.0-rc1 — review checkpoint, November 23, 2026
+
+Code checkpoint `0aba28bc312d1b635a9db9976adcad760db2df45`; regression-test checkpoint `53d623d58ce836bd55cb8a0f02225e251995c3e3` in draft PR #2. Generated cloud-disabled sample QA branch `v7.4.0-rc1-sample-qa`, commit `707789a51ebe36ec50b4b3c786a278f0e320b05a`.
+
+- Added farmer contact history, optional field/year links, search, independent one-time contact reminders and home shortcut.
+- Expanded crop-year chemical/fertilizer plan to multiple numbered passes, farmer roll-up, shared structured prepay, conversation links, fertilizer blend links and planned vs farmer-reported work. Linked spray recipes save full recipe snapshots. Planned orders are separately saved immutable snapshots without modifying existing assignments.
+- Added soil-test history, regional base recommendations with explicit source/inputs, saved dry fertilizer products, nutrient balancing and blend calculation (lb/ac, US tons, nutrient balance and costs). Optional linked planned operation is saved with the blend in one local transaction; unseen revisions, overlapping operations and reported completion prevent unsafe replacement.
+- Supported rule scope: SDSU 2026 corn, soybean and wheat base N/P/K with validated units and reviewed N assumptions; NDSU SF882 corn P and exact published K price cells, soybean P/K and conditional zero N, spring/winter wheat P/K and conditional winter wheat N. ND corn/spring wheat economic N, sulfur, and unsupported crop/input cases require manual review. No automatic seed-placement prescriptions, liquid conversion or claims of actual application.
+- New independent record families use existing settings storage/sync, full-device JSON backup and new restore reference checks. All five modules included in versioned scoped cache. Sample and blank-roster builders use separate storage; no real roster or configured backend in sample QA tree.
+- Verification: repository source parsed and executed in a V8 harness with simulated Node I/O; hand-calculated blend, source-specific rate cases, spray quantity/rounding/snapshot, pass history/overlap, contact completion, invalid backup reference, QA bundle and simulated service-worker cases passed. No real desktop/iPad, live Supabase or browser restore passes newly recorded. Review code and sample branch uploaded; no merge or Pages deployment. Production unchanged. Rollback: retain V7.3.0 deployed baseline; do not migrate live records. Prior privacy gates still apply.
