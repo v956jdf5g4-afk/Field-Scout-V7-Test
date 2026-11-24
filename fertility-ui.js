@@ -6,7 +6,7 @@
  panel.innerHTML='<summary>Soil Tests &amp; Fertilizer Blends</summary><p id="ftContext"></p><button type="button" id="ftNewContext">Start a new entry for selected field/year</button><label>Field <select id="ftField"></select></label><h3>Soil test</h3><form id="ftSoil"><label>Sample date <input id="ftDate" type="date" required></label><label>Lab/report reference <input id="ftLab" maxlength="200"></label><label>Previous crop <input id="ftPrev" maxlength="100"></label><label>Yield goal and units <input id="ftYield" maxlength="100"></label><div id="ftTests"></div><label>pH <input id="ftPH" type="number" min="0" max="14" step="any"></label><label>Organic matter (%) <input id="ftOM" type="number" min="0" max="100" step="any"></label><button>Save soil test</button></form><h3>University base recommendation</h3><p><a href="https://lamp.ndsu.edu/soils/FourCropsNitrogenCalculatorWebApp/" target="_blank" rel="noopener noreferrer">Official NDSU economic nitrogen calculator (online)</a>. Use a manually reviewed target where the offline rules do not support a nutrient or crop.</p><p>Use the soil test above. For supported rules enter P and K as ppm, depth exactly 0-6 in, and methods Olsen or Bray-1 and Ammonium acetate. Unavailable nutrients require manual review.</p><label>Field state <select id="ftState"><option value="">Choose state</option><option value="ND">North Dakota</option><option value="SD">South Dakota</option></select></label><label>Yield goal (bu/ac; SD only) <input id="ftRecYield" type="number" min="0" step="any"></label><label>ND clay smectite:illite class <select id="ftClay"><option value="">Not established</option><option value="low">Below 3.5</option><option value="high">Above 3.5</option></select></label><label>ND corn region <select id="ftCornRegion"><option value="">Not established</option><option value="west">West River dryland</option><option value="east">East River dryland</option><option value="irrigated">Irrigated</option></select></label><label>ND corn price ($/bu; exact table value 2–10) <input id="ftCornPrice" type="number" min="2" max="10" step="1"></label><label>ND price per lb K2O (not per lb potash) <select id="ftKCost"><option value="">Not entered</option><option>0.125</option><option>0.20</option><option>0.30</option><option>0.40</option><option>0.50</option><option>0.60</option><option>0.70</option><option>0.80</option><option>0.90</option><option>1.00</option></select></label><label>ND winter wheat productivity <select id="ftProductivity"><option value="">Not established</option><option value="low">Below 40 bu/ac</option><option value="medium">40–60 bu/ac</option><option value="high">Above 60 bu/ac</option></select></label><label>ND Langdon region <select id="ftLangdon"><option value="">Not established</option><option value="yes">Yes</option><option value="no">No</option></select></label><label>ND long-term no-till (6+ continuous years) <select id="ftNoTill"><option value="">Not established</option><option value="yes">Yes</option><option value="no">No</option></select></label><label>Starter band planned <select id="ftStarter"><option value="">Not established</option><option value="yes">Yes</option><option value="no">No</option></select></label><label><input id="ftInoculated" type="checkbox"> Soybean inoculation confirmed</label><label>N credits (lb/ac) <input id="ftCredits" type="number" min="0" step="any"></label><label>Additional N adjustment (lb/ac) <input id="ftAdjust" type="number" min="0" step="any"></label><label><input id="ftReviewedCredits" type="checkbox"> N credits and tillage/other adjustments reviewed</label><button id="ftRecommend" type="button">Calculate base recommendation</button><button id="ftAcceptRec" type="button">Save and use reviewed targets</button><pre id="ftRecResult" style="white-space:pre-wrap"></pre><h3>Dry fertilizer blend</h3><p>Enter agronomist-reviewed targets in lb nutrient/ac for this pass. This calculator does not account for previously applied fertilizer automatically.</p><form id="ftBlend"><label>Application method <select id="ftMethod"><option>Broadcast</option><option>Strip-till</option><option>Starter</option><option>Other</option></select></label><label>Pass number <input id="ftPassNumber" type="number" min="1" max="20" step="1" value="1" required></label><label>Pass / purpose <input id="ftPass" required maxlength="100" placeholder="e.g. Spring base fertilizer"></label><label><input type="checkbox" id="ftLinkPlan"> Also save a planned Field Plan operation for this field/pass</label><div id="ftTargets"></div><div id="ftProducts"></div><button type="button" id="ftAdd">Add product</button> <button type="button" id="ftPreview">Calculate</button> <button>Save blend</button></form><pre id="ftResult" style="white-space:pre-wrap"></pre><p id="ftStatus" role="status"></p><h3>Saved field-year history</h3><div id="ftHistory"></div>';
  $('cropYearFieldPlan').after(panel);
  const keys=['N','P2O5','K2O','S'];
- const field=$('ftField');let ticket=0,busy=false,loadedYear=null,loadedField=null,draftScope=null;
+ const field=$('ftField');let ticket=0,busy=false,loadedYear=null,loadedField=null,draftScope=null,visibleSettings=[];
  function input(label,type='text'){const l=el('label',label+' '),i=el('input');i.type=type;if(type==='number'){i.min='0';i.step='any'}l.append(i);return [l,i]}
  const tests=['Nitrate-N','P','K','S'].map(name=>{
   const row=el('fieldset');row.append(el('legend',name));const controls={};
@@ -50,17 +50,30 @@
   $('ftContext').textContent='Crop year '+year+' · confirmed fields only';
   try{const settings=await getAll('settings');if(t!==ticket||year!==cropYear||selected!==field.value)return;
    library=settings.filter(r=>r.key.startsWith(libPrefix)&&r.value?.name&&r.value.id).map(r=>r.value).sort((a,b)=>a.name.localeCompare(b.name)||b.createdAt.localeCompare(a.createdAt));for(const p of products)setLibraryOptions(p.selector);
+   visibleSettings=settings;
    const history=settings.filter(r=>r.key.startsWith(prefix)&&r.value?.ctx?.year===year&&r.value.ctx.fieldId===selected).map(r=>r.value).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
-   $('ftHistory').replaceChildren(...history.map(r=>{const d=el('details');d.append(el('summary',r.kind==='soil'?'Soil test · '+r.sampleDate:r.kind==='recommendation'?'Recommendation · '+r.recommendation.version:'Blend · '+r.method+' #'+(r.passNumber||1)+' · '+r.pass),el('pre',JSON.stringify(r,null,2)));d.lastChild.style.whiteSpace='pre-wrap';return d}));if(!history.length)$('ftHistory').textContent='No saved soil tests or blends.';
+   const superseded=new Set(history.filter(r=>r.kind==='blend').flatMap(r=>r.previous||[]));
+   $('ftHistory').replaceChildren(...history.map(r=>{const d=el('details');d.append(el('summary',r.kind==='soil'?'Soil test · '+r.sampleDate:r.kind==='recommendation'?'Recommendation · '+r.recommendation.version:(superseded.has(r.id)?'Earlier blend · ':'Current blend (check for overlap) · ')+r.method+' #'+(r.passNumber||1)+' · '+r.pass),el('pre',JSON.stringify(r,null,2)));d.lastChild.style.whiteSpace='pre-wrap';return d}));if(!history.length)$('ftHistory').textContent='No saved soil tests or blends.';
    loadedYear=year;loadedField=selected;
   }catch(e){$('ftStatus').textContent='Could not load: '+e.message}
  }
+ function relevantHeads(rows,b,kind){
+  const type={Broadcast:'broadcast','Strip-till':'strip',Starter:'starter',Other:'otherfert'}[b.method];
+  const records=kind==='blend'?rows.filter(r=>r.key.startsWith(prefix)&&r.value?.kind==='blend'&&r.value.ctx?.fieldId===b.ctx.fieldId&&r.value.ctx.year===b.ctx.year&&r.value.method===b.method&&(r.value.passNumber||1)===b.passNumber).map(r=>r.value):rows.filter(r=>r.key.startsWith('field-plan-v1:')&&r.value?.year===b.ctx.year&&r.value.type===type&&(r.value.pass||1)===b.passNumber&&r.value.targets?.some(t=>t.fieldId===b.ctx.fieldId)).map(r=>r.value);
+  const old=new Set(records.flatMap(r=>kind==='blend'?(r.previous||[]):(r.targets.find(t=>t.fieldId===b.ctx.fieldId).previous||[])));return records.filter(r=>!old.has(r.id))
+ }
+ const ids=rows=>rows.map(r=>r.id).sort().join('|');
  async function saveBlend(b){
   if(busy)return;busy=true;
   try{
    if(!Number.isInteger(b.passNumber)||b.passNumber<1||b.passNumber>20)throw Error('Choose a valid pass number (1–20).');
    const link=$('ftLinkPlan').checked;
-   if(link&&!confirm('Save blend and create/revise the planned operation? This will not report an application.'))return;
+   const reviewedBlends=relevantHeads(visibleSettings,b,'blend'),reviewedPlans=relevantHeads(visibleSettings,b,'plan');
+   if(reviewedBlends.length&&!confirm('Save a revision of the current blend(s)? '+reviewedBlends.map(r=>r.pass+' ('+r.createdAt+')').join('; ')+' Earlier versions remain.'))return;
+   if(link){
+    if(reviewedPlans.length>1||reviewedPlans.some(r=>r.state==='reported'))throw Error('Current plan has overlap or reported completion. Review it in Field Plan; save the blend without linking.');
+    if(!confirm('Save blend and '+(reviewedPlans.length?'revise planned operation: '+reviewedPlans[0].text:'create planned operation')+'? No application is reported.'))return;
+   }
    const id=crypto.randomUUID(),now=new Date().toISOString(),record={id,kind:'blend',createdAt:now,...b};
    let rejected='';
    await transaction(['settings'],'readwrite',tx=>{
@@ -68,15 +81,12 @@
     req.onsuccess=()=>{
      try{
       const all=req.result;
-      const sameBlend=all.filter(r=>r.key.startsWith(prefix)&&r.value?.kind==='blend'&&r.value.ctx?.fieldId===b.ctx.fieldId&&r.value.ctx.year===b.ctx.year&&r.value.method===b.method&&(r.value.passNumber||1)===b.passNumber).map(r=>r.value);
-      const oldBlendIds=new Set(sameBlend.flatMap(r=>r.previous||[]));const blendHeads=sameBlend.filter(r=>!oldBlendIds.has(r.id));record.previous=blendHeads.map(r=>r.id);
-      if(blendHeads.length>1){rejected='Overlapping blend revisions. Review saved history before adding a correction.';/* explicit new reviewed blend can resolve after confirmation outside transaction */ }
-      if(rejected){tx.abort();return}
+      const blendHeads=relevantHeads(all,b,'blend');record.previous=blendHeads.map(r=>r.id);
+      if(ids(blendHeads)!==ids(reviewedBlends)){rejected='Blend history changed; refresh and review before saving.';tx.abort();return}
       if(link){
        const type={Broadcast:'broadcast','Strip-till':'strip',Starter:'starter',Other:'otherfert'}[b.method];
-       const plans=all.filter(r=>r.key.startsWith('field-plan-v1:')&&r.value?.year===b.ctx.year&&r.value.type===type&&(r.value.pass||1)===b.passNumber&&r.value.targets?.some(t=>t.fieldId===b.ctx.fieldId)).map(r=>r.value);
-       const old=new Set(plans.flatMap(r=>r.targets.find(t=>t.fieldId===b.ctx.fieldId).previous||[])),heads=plans.filter(r=>!old.has(r.id));
-       if(heads.length>1||heads.some(r=>r.state==='reported')){rejected='Existing plan needs review or has reported completion. Save blend without the plan link; do not overwrite reported work.';tx.abort();return}
+       const heads=relevantHeads(all,b,'plan');
+       if(ids(heads)!==ids(reviewedPlans)||heads.length>1||heads.some(r=>r.state==='reported')){rejected='Plan changed or needs review; no records saved.';tx.abort();return}
        const planId=crypto.randomUUID(),{fieldId,name,acres,crop,operator,year}=b.ctx;
        const text=b.pass+' · '+b.calculation.rows.map(r=>r.name+' '+r.rate+' lb/ac').join('; ');
        store.add({key:'field-plan-v1:'+planId,value:{id:planId,year,type,pass:b.passNumber,state:'planned',createdAt:now,workDate:'',text,blendId:id,targets:[{fieldId,name,acres,crop,operator,previous:heads.map(r=>r.id)}]}});
