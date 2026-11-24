@@ -70,3 +70,10 @@ Run `node tests/field-plan-check.cjs` with Node 18 or later. The checks use synt
 
 - [x] Mock private roster provisioning requires an account, filters by owner, rejects missing rows and account drift during provisioning, then reloads from the local roster.
 - [ ] Exercise account isolation and private roster provisioning against a synthetic test backend before enabling the roster-free shell. Real-device recovery testing deferred at user direction.
+
+### Live roster authorization check
+
+Run `node tests/private-roster-supabase.cjs` with an isolated Supabase origin, publishable key and two disposable authenticated sessions. The script refuses the app's configured backend and uses a unique synthetic settings key. It verifies owner save/read plus signed-out and second-account read isolation. The sample row remains in the disposable project for inspection. Never pass a service-role key.
+
+- [x] Runner syntax and missing-configuration guard checked. Existing simulated roster, recovery, planning and cache checks passed.
+- [ ] Live run needs the isolated Supabase project and disposable sessions. Device recovery remains deferred.
