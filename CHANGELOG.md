@@ -34,3 +34,7 @@ Built against the V7.3.0 foundation commit `1587988cd03d17a3b2146824e47356698c19
 ### Offline roster recovery (draft)
 
 Full-device JSON can initialize an empty local roster with the backup’s validated field rows, notes and settings in one IndexedDB transaction. Stored rosters reload locally. An initialized installation still requires a matching roster. No cloud schema change or deployment. Rollback before merge is to revert this draft change.
+
+### Authenticated roster loading (draft)
+
+A roster-free shell can read its signed-in account’s pre-provisioned roster, validate it, and store it locally for offline access. Normal sync waits for successful provisioning. Existing bundled-roster behavior stays in place pending migration. No cloud row was created and no app was deployed. Revert the draft commits to roll back.
