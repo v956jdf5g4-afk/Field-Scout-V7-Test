@@ -15,6 +15,7 @@ const roster = /^const fields=\[.*\];$/m;
 const farmers = /const farmerNames=\{[^\n]*?\};/;
 const {FIELD_SCOUT_QA_URL, FIELD_SCOUT_QA_PUBLIC_KEY} = process.env;
 const sample = process.argv.includes('--sample');
+const suffix=sample?'sample-rc1':'recovery-rc1';
 assert.ok(!sample || !FIELD_SCOUT_QA_URL, 'Sample build must remain cloud-disabled');
 assert.equal(Boolean(FIELD_SCOUT_QA_URL), Boolean(FIELD_SCOUT_QA_PUBLIC_KEY),
   'Provide both the isolated QA origin and publishable key, or neither.');
@@ -43,11 +44,13 @@ const html = source
   .replace(configuredKey, () => 'const KEY=' + JSON.stringify(publicKey) + ';')
   .replace("if(client||initializingCloud||!navigator.onLine)return;",
     "if(!URL){status('Cloud disabled for this synthetic build.');return}\n if(client||initializingCloud||!navigator.onLine)return;")
-  .replaceAll('FieldScoutOfflineV7Test', 'FieldScoutPrivateRosterQA-v2')
-  .replaceAll('FieldScoutV7RecoverySnapshots', 'FieldScoutPrivateRosterQA-Snapshots-v1')
-  .replaceAll('fieldscout_prototype_notes_v1', 'fieldscout_private_roster_qa_notes_v1')
-  .replaceAll('fieldscout_v4_plan', 'fieldscout_private_roster_qa_plan_v1')
-  .replaceAll('fieldscout_last_backup_v2', 'fieldscout_private_roster_qa_backup_v1')
+  .replaceAll('FieldScoutOfflineV7Test', 'FieldScoutPrivateRosterQA-'+suffix)
+  .replaceAll('FieldScoutV7RecoverySnapshots', 'FieldScoutPrivateRosterQA-Snapshots-'+suffix)
+  .replaceAll('fieldscout_prototype_notes_v1', 'fieldscout_private_roster_qa_notes_'+suffix)
+  .replaceAll('fieldscout_v4_plan', 'fieldscout_private_roster_qa_plan_'+suffix)
+  .replaceAll('fieldscout_last_backup_v2', 'fieldscout_private_roster_qa_backup_'+suffix)
+  .replaceAll('fs-last-field','fs-last-field-'+suffix)
+  .replace('Version 7.4.0-rc1 · Review build',sample?'Version 7.4.0-rc1 · SAMPLE QA (cloud disabled)':'Version 7.4.0-rc1 · Isolated roster QA')
   .replace(/<link rel="apple-touch-icon"[^>]+>/, '')
   .replace(/<title>[^<]+<\/title>/, '<title>Field Scout Private Roster QA</title>');
 
@@ -61,7 +64,7 @@ manifest.name = 'Field Scout Private Roster QA';
 manifest.short_name = 'Roster QA';
 delete manifest.icons;
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'field-scout-roster-qa-'));
-const worker = read('sw.js').replace(/const CACHE = PREFIX \+ '[^']+';/, "const CACHE = PREFIX + 'private-roster-qa-rc1';");
+const worker = read('sw.js').replace(/const CACHE = PREFIX \+ '[^']+';/, "const CACHE = PREFIX + 'private-roster-qa-"+suffix+"';");
 for (const [file, contents] of Object.entries({
   'index.html': html,
   'field-plan.js': read('field-plan.js'),
