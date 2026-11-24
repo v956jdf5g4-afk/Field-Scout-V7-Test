@@ -57,3 +57,10 @@ Run `node tests/field-plan-check.cjs` with Node 18 or later. The checks use synt
 - [ ] Verify settings pagination across more than one server page and validate row-level policies and save-RPC authorization for signed-out, owner, and non-owner accounts with synthetic data.
 - [ ] Verify clean install and upgrade from V7.3.0. Check cached data and unsynced records. Confirm the old backup commands are hidden and CSV/full-device backup still work.
 - [ ] Check per-field spray quantities and printed saved order after source edits. Current report presentation groups line totals by recipe, rounds displayed quantities to three decimal places and uses the first encountered packaging size for a product. Resolve package preference and reporting detail before production use.
+
+### Private roster feasibility check
+
+- Earlier dashboard review recorded owner-matching RLS on all four operations. The save function derives ownership from the signed-in user and checks revisions. Independent live signed-out and second-account tests remain pending.
+- `node tests/private-roster-check.cjs` passed against the draft with synthetic rows. Mock account transport and local storage preserve field IDs, the 2026 baseline, the 2027 override and historical note references. This does not exercise live Supabase or browser persistence.
+- The existing full-device JSON validator accepts a matching roster and rejects an empty or different roster. Fresh-device offline recovery needs a validated bootstrap that stages the roster and dependent data and commits them in the same local transaction. Preserve existing field IDs and fail safely if the backup does not match an already-initialized device.
+- No app code, deployment, database configuration, or real-device QA changed. The check can be removed by reverting its commit.
