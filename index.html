@@ -84,13 +84,28 @@ function visibleRecords(){return records.filter(r=>Number(r.cropYear||2026)===cr
 function effectiveFollowup(id){const rr=visibleRecords().filter(r=>r.fieldId===id).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)||b.id.localeCompare(a.id));const mostRecent=rr[0];return mostRecent&&!mostRecent.endYear?mostRecent.followup||'':''}
 const $=id=>document.getElementById(id), key='fieldscout_prototype_notes_v1';let current=null;let records=[];
 let db=null,ready=false,saving=false;
+// Kept device-local. A future private-roster build can start without bundled rows.
+const restoredRosterKey='v7-restored-roster-v1';
+function validateBackupRoster(rows){
+ if(!Array.isArray(rows)||!rows.length||rows.length>10000)throw Error('Invalid field roster in backup.');
+ const ids=new Set();
+ for(const row of rows){
+  if(!Array.isArray(row)||row.length!==5)throw Error('Invalid field row in backup.');
+  const [id,name,acres,crop,operator]=row;
+  if(typeof id!=='string'||!id||id.length>80||/\s/.test(id)||ids.has(id)||
+     ![name,crop,operator].every(value=>typeof value==='string'&&value.trim()&&value.length<=250)||
+     !Number.isFinite(acres)||acres<=0)throw Error('Invalid or duplicate field in backup.');
+  ids.add(id);
+ }
+ return ids;
+}
 function transaction(stores,mode,fn){return new Promise((resolve,reject)=>{const tx=db.transaction(stores,mode);let result;tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error||new Error('Database transaction failed'));tx.onabort=()=>reject(tx.error||new Error('Database transaction aborted'));try{result=fn(tx)}catch(e){tx.abort();reject(e)}})}
 function getAll(store){return new Promise((resolve,reject)=>{const tx=db.transaction(store,'readonly');const req=tx.objectStore(store).getAll();req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
 function getSetting(name){return new Promise((resolve,reject)=>{const req=db.transaction('settings','readonly').objectStore('settings').get(name);req.onsuccess=()=>resolve(req.result?.value);req.onerror=()=>reject(req.error)})}
 function setStatus(t){$('saveStatus').textContent=t}
-function validRecord(r){return r&&typeof r.id==='string'&&typeof r.fieldId==='string'&&fields.some(f=>f[0]===r.fieldId.replace(/\s+/g,''))&&typeof r.text==='string'&&r.text.length<=100000&&typeof r.createdAt==='string'&&!Number.isNaN(Date.parse(r.createdAt))&&(!r.followup||/^\d{4}-\d{2}-\d{2}$/.test(r.followup))}
+function validRecord(r, fieldIds){return r&&typeof r.id==='string'&&typeof r.fieldId==='string'&&(fieldIds ? fieldIds.has(r.fieldId.replace(/\s+/g,'')) : fields.some(f=>f[0]===r.fieldId.replace(/\s+/g,'')))&&typeof r.text==='string'&&r.text.length<=100000&&typeof r.createdAt==='string'&&!Number.isNaN(Date.parse(r.createdAt))&&(!r.followup||/^\d{4}-\d{2}-\d{2}$/.test(r.followup))}
 async function openDatabase(){return new Promise((resolve,reject)=>{const req=indexedDB.open('FieldScoutOfflineV7Test',1);req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains('notes'))d.createObjectStore('notes',{keyPath:'id'});if(!d.objectStoreNames.contains('settings'))d.createObjectStore('settings',{keyPath:'key'})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);req.onblocked=()=>reject(new Error('Close other Field Scout tabs and try again'))})}
-async function initialize(){try{db=await openDatabase();let old=[];try{old=JSON.parse(localStorage.getItem(key)||'[]')}catch{};if(Array.isArray(old)&&old.length){const existing=await getAll('notes');if(!existing.length){await transaction(['notes'],'readwrite',tx=>{for(const r of old){const x={...r,fieldId:String(r.fieldId||'').replace(/\s+/g,'')};if(validRecord(x)){x.id=String(x.id||crypto.randomUUID());tx.objectStore('notes').put(x)}}})}}records=(await getAll('notes')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt));const stored=await getSetting('plan');if(Array.isArray(stored))plan=stored.filter(id=>fields.some(f=>f[0]===id));else{try{const oldPlan=JSON.parse(localStorage.getItem(planKey)||'[]');if(Array.isArray(oldPlan))plan=oldPlan.map(id=>String(id).replace(/\s+/g,'')).filter(id=>fields.some(f=>f[0]===id));await transaction(['settings'],'readwrite',tx=>tx.objectStore('settings').put({key:'plan-'+cropYear,value:plan}))}catch{}}ready=true;setStatus('Saved on this iPad/browser');renderDashboard();if(current)renderHistory();try{if(navigator.storage?.persist){const persistent=await navigator.storage.persist();if(persistent)setStatus('Local storage protected*')}}catch{} }catch(e){setStatus('Storage unavailable');$('backupStatus').textContent='Storage error: '+e.message+' — do not enter scouting records.';console.error(e)}}
+async function initialize(){try{db=await openDatabase();if(!fields.length){const roster=await getSetting(restoredRosterKey);if(roster!==undefined){validateBackupRoster(roster);for(const row of roster)fields.push(row)}}refreshCropFilter();let old=[];try{old=JSON.parse(localStorage.getItem(key)||'[]')}catch{};if(Array.isArray(old)&&old.length){const existing=await getAll('notes');if(!existing.length){await transaction(['notes'],'readwrite',tx=>{for(const r of old){const x={...r,fieldId:String(r.fieldId||'').replace(/\s+/g,'')};if(validRecord(x)){x.id=String(x.id||crypto.randomUUID());tx.objectStore('notes').put(x)}}})}}records=(await getAll('notes')).sort((a,b)=>a.createdAt.localeCompare(b.createdAt));const stored=await getSetting('plan');if(Array.isArray(stored))plan=stored.filter(id=>fields.some(f=>f[0]===id));else{try{const oldPlan=JSON.parse(localStorage.getItem(planKey)||'[]');if(Array.isArray(oldPlan))plan=oldPlan.map(id=>String(id).replace(/\s+/g,'')).filter(id=>fields.some(f=>f[0]===id));await transaction(['settings'],'readwrite',tx=>tx.objectStore('settings').put({key:'plan-'+cropYear,value:plan}))}catch{}}ready=true;setStatus('Saved on this iPad/browser');renderDashboard();if(current)renderHistory();try{if(navigator.storage?.persist){const persistent=await navigator.storage.persist();if(persistent)setStatus('Local storage protected*')}}catch{} }catch(e){setStatus('Storage unavailable');$('backupStatus').textContent='Storage error: '+e.message+' — do not enter scouting records.';console.error(e)}}
 
 function renderFields(){const q=$('search').value.toLowerCase().replace(/\s+/g,'').trim();$('fields').replaceChildren();yearFields().filter(f=>(f[0]+' '+f[1]+' '+f[3]).toLowerCase().replace(/\s+/g,'').includes(q)).forEach(f=>{const b=document.createElement('button');b.className='field'+(current===f[0]?' active':'');b.textContent=f[0]+' — '+f[1];const s=document.createElement('small');s.textContent=f[3]+' · '+fieldAcresLabel(f)+' · '+f[4];b.append(s);b.onclick=()=>selectField(f[0]);$('fields').append(b)});if(!$('fields').children.length)$('fields').textContent='No matching fields'}
 function selectField(id){
@@ -151,7 +166,15 @@ const completedToday=id=>visibleRecords().some(r=>r.fieldId===id&&localDate(r.cr
 async function savePlan(){if(!ready){$('planFeedback').textContent='Storage is not ready';return}try{await transaction(['settings'],'readwrite',tx=>tx.objectStore('settings').put({key:'plan-'+cropYear,value:plan}));$('planFeedback').textContent='Plan saved in this device.';setStatus('Saved locally')}catch(e){$('planFeedback').textContent='Could not save plan: '+e.message;const stored=await getSetting('plan-'+cropYear);plan=Array.isArray(stored)?stored:[]}renderDashboard()}
 function showTab(tab){$('homeView').classList.toggle('hide',tab!=='home');$('scoutView').classList.toggle('hide',tab!=='scout');$('planningView').classList.toggle('hide',tab!=='planning');$('homeTab').classList.toggle('selected',tab==='home');$('scoutTab').classList.toggle('selected',tab==='scout');$('planningTab').classList.toggle('selected',tab==='planning');if(tab==='home')renderDashboard();window.scrollTo(0,0)}
 $('homeTab').onclick=()=>showTab('home');$('scoutTab').onclick=()=>{showTab('scout');setFieldList(true)};$('planningTab').onclick=()=>showTab('planning');$('backToHome').onclick=()=>showTab('home');
-const crops=[...new Set(fields.map(f=>f[3]))].sort();for(const crop of [...crops,UNCONFIRMED_CROP]){const o=document.createElement('option');o.value=crop;o.textContent=crop;$('cropFilter').append(o)}
+function refreshCropFilter(){
+ const filter=$('cropFilter');
+ const crops=[...new Set(fields.map(f=>f[3]))].sort();
+ for(const crop of [...crops,UNCONFIRMED_CROP]){
+  if([...filter.options].some(option=>option.value===crop))continue;
+  const option=document.createElement('option');option.value=crop;option.textContent=crop;filter.append(option);
+ }
+}
+refreshCropFilter();
 function makeRow(f,action,label,status,clickableName=false){const row=document.createElement('div');row.className='planrow';const left=document.createElement('div');const name=document.createElement(clickableName?'button':'div');name.className='fieldname'+(clickableName?' fieldname-link':'');name.textContent=f[0]+' — '+f[1];if(clickableName){name.type='button';name.setAttribute('aria-label','Open scouting history for '+f[0]+' — '+f[1]);name.onclick=()=>selectField(f[0])}const meta=document.createElement('small');meta.textContent=f[3]+' · '+fieldAcresLabel(f)+(status?' · '+status:'');left.append(name,meta);const actions=document.createElement('div');actions.style.display='flex';actions.style.gap='6px';const open=document.createElement('button');open.className='mini primary';open.textContent='Scout';open.onclick=()=>selectField(f[0]);actions.append(open);if(action){const btn=document.createElement('button');btn.className='mini';btn.textContent=label;btn.onclick=action;actions.append(btn)}row.append(left,actions);return row}
 function renderDashboard(){const day=today();$('planDate').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});const done=yearFields().filter(f=>completedToday(f[0])).map(f=>f[0]),remaining=plan.filter(id=>!completedToday(id));const due=yearFields().filter(f=>{const d=effectiveFollowup(f[0]);return d&&d<=day&&!completedToday(f[0])});$('countPlanned').textContent=remaining.length;$('countCompleted').textContent=done.length;$('countDue').textContent=due.length;
 const planned=$('plannedFields');planned.replaceChildren();if(!remaining.length){const p=document.createElement('p');p.className='empty';p.textContent='No fields remaining. Use the Planning tab to add fields.';planned.append(p)}for(const farmer of ['HT','JF','JP','JR']){const ff=remaining.map(id=>yearFields().find(f=>f[0]===id)).filter(f=>f&&f[4]===farmer);if(!ff.length)continue;const group=document.createElement('h3');group.textContent=farmerNames[farmer]+' ('+ff.length+')';planned.append(group);for(const crop of [...crops,UNCONFIRMED_CROP]){const subset=ff.filter(f=>f[3]===crop);if(!subset.length)continue;const h=document.createElement('div');h.className='muted';h.textContent=crop+' ('+subset.length+')';planned.append(h);subset.sort((a,b)=>a[0].localeCompare(b[0],undefined,{numeric:true})).forEach(f=>planned.append(makeRow(f,()=>{plan=plan.filter(id=>id!==f[0]);savePlan()},'Remove')))}}
@@ -273,7 +296,7 @@ function renderYearReview(){
 }
 function downloadJson(data,name){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}
 function backupPayload(all,p){return {format:'FieldScoutBackup',version:3,selectedCropYear:cropYear,annual,exportedAt:new Date().toISOString(),sourceDevice:'manual-export',fields:yearFields().map(f=>({fieldId:f[0],name:f[1],acres:f[2],crop:f[3],operator:f[4],cropYear})),records:all,plan:Array.isArray(p)?p:[]}}
-function parseBackup(data){if(data?.format!=='FieldScoutBackup'||![1,2,3].includes(data.version)||!Array.isArray(data.records)||!Array.isArray(data.plan))throw Error('Not a supported Field Scout backup');if(data.records.length>100000||!data.records.every(validRecord)||!data.plan.every(id=>typeof id==='string'&&fields.some(f=>f[0]===id)))throw Error('Backup contains invalid records');if(data.version>=2&&(!Array.isArray(data.fields)||data.fields.length>10000||!data.fields.every(f=>f&&typeof f.fieldId==='string'&&typeof f.name==='string')))throw Error('Field list in backup is invalid');return data}
+function parseBackup(data){if(data?.format!=='FieldScoutBackup'||![1,2,3].includes(data.version)||!Array.isArray(data.records)||!Array.isArray(data.plan))throw Error('Not a supported Field Scout backup');if(data.records.length>100000||!data.records.every(record=>validRecord(record))||!data.plan.every(id=>typeof id==='string'&&fields.some(f=>f[0]===id)))throw Error('Backup contains invalid records');if(data.version>=2&&(!Array.isArray(data.fields)||data.fields.length>10000||!data.fields.every(f=>f&&typeof f.fieldId==='string'&&typeof f.name==='string')))throw Error('Field list in backup is invalid');return data}
 function showLastBackup(){try{const v=localStorage.getItem('fieldscout_last_backup_v2');$('lastBackup').textContent=v?'Last backup exported: '+new Date(v).toLocaleString():'No backup exported from this device yet'}catch{}}
 $('backupAll').onclick=async()=>{if(!ready){$('backupStatus').textContent='Storage is not ready';return}try{const all=await getAll('notes');const p=await getSetting('plan-'+cropYear);const payload=backupPayload(all,p);downloadJson(payload,'FieldScout-backup-'+today()+'-'+new Date().toTimeString().slice(0,8).replaceAll(':','')+'.json');try{localStorage.setItem('fieldscout_last_backup_v2',payload.exportedAt)}catch{}showLastBackup();$('backupStatus').textContent='Backup prepared ('+all.length+' notes, '+fields.length+' fields). Confirm it was saved to Google Drive.'}catch(e){$('backupStatus').textContent='Backup failed: '+e.message}};
 $('importFile').onchange=async e=>{const file=e.target.files?.[0];if(!file||!ready)return;try{if(file.size>20*1024*1024)throw Error('Backup is too large');const data=parseBackup(JSON.parse(await file.text()));const existing=await getAll('notes'),known=new Map(existing.map(r=>[r.id,r]));const additions=[],updates=[];let unchanged=0,older=0,conflicts=0;for(const r of data.records){const old=known.get(r.id);if(!old){additions.push(r);continue}if(JSON.stringify(old)===JSON.stringify(r)){unchanged++;continue}const oldTime=old.updatedAt||old.deletedAt||old.createdAt,newTime=r.updatedAt||r.deletedAt||r.createdAt;if(newTime>oldTime)updates.push(r);else if(newTime<oldTime)older++;else conflicts++}if(conflicts){$('backupStatus').textContent='Import stopped: '+conflicts+' conflicting records with equal revision timestamps. No changes made.';return}if(!additions.length&&!updates.length){$('backupStatus').textContent='0 new notes imported. '+unchanged+' already present; '+older+' older copies ignored. No duplicates created.';alert($('backupStatus').textContent);return}if(!confirm('Import '+additions.length+' new notes and '+updates.length+' newer edits/deletions? Existing plan will remain unchanged.'))return;await transaction(['notes'],'readwrite',tx=>{for(const r of [...additions,...updates])tx.objectStore('notes').put(r)});records=await getAll('notes');renderDashboard();if(current)renderHistory();$('backupStatus').textContent='Imported '+additions.length+' new notes and '+updates.length+' updated records; '+unchanged+' unchanged, '+older+' older ignored. Plan unchanged.';alert($('backupStatus').textContent)}catch(err){$('backupStatus').textContent='Import failed: '+err.message;alert($('backupStatus').textContent)}finally{e.target.value=''}};
@@ -778,7 +801,7 @@ else report('Offline — notes are saved on this device; cloud will retry when c
  }catch(e){$('v71ExportStatus').textContent='Export failed: '+e.message}};
  $('v71FullBackup').onclick=async()=>{try{
   if(!ready)throw Error('Local storage is not ready');
-  const notes=await getAll('notes'),settings=await getAll('settings');
+  const notes=await getAll('notes'),settings=(await getAll('settings')).filter(item=>item.key!==restoredRosterKey);
   const payload={format:'FieldScoutV71FullDeviceBackup',version:1,createdAt:new Date().toISOString(),notes,settings,staticFields:fields,warning:'Full device export. Restore requires review; do not import through the older scouting-only restore button.'};
   download(JSON.stringify(payload,null,2),'FieldScout-full-device-'+stamp()+'.json','application/json');
   $('v71ExportStatus').textContent='Full-device backup prepared: '+notes.length+' notes and '+settings.length+' settings (including local spray and plan data). Verify it appears in Downloads.';
@@ -795,11 +818,32 @@ else report('Offline — notes are saved on this device; cloud will retry when c
   if(!data||data.format!=='FieldScoutV71FullDeviceBackup'||data.version!==1)throw Error('Not a supported full-device backup. Use the JSON from Download full-device backup.');
   if(!Array.isArray(data.notes)||!Array.isArray(data.settings)||!Array.isArray(data.staticFields))throw Error('Missing notes, settings or field list.');
   if(data.notes.length>100000||data.settings.length>20000||data.staticFields.length>10000)throw Error('Backup exceeds supported limits.');
-  if(!same(data.staticFields,fields))throw Error('Field list differs from this app version. No changes made; review the backup before restoring.');
+  const rosterIds=validateBackupRoster(data.staticFields);
+  if(fields.length&&!same(data.staticFields,fields))throw Error('Field list differs from this app version. No changes made; review the backup before restoring.');
   const ids=new Set(),keys=new Set();
-  for(const note of data.notes){if(!validRecord(note)||ids.has(note.id))throw Error('Invalid or duplicate scouting note in backup.');ids.add(note.id)}
-  for(const item of data.settings){if(!item||typeof item.key!=='string'||!item.key||item.key.length>250||!Object.prototype.hasOwnProperty.call(item,'value')||keys.has(item.key))throw Error('Invalid or duplicate setting in backup.');keys.add(item.key)}
+  for(const note of data.notes){if(!validRecord(note,rosterIds)||ids.has(note.id))throw Error('Invalid or duplicate scouting note in backup.');ids.add(note.id)}
+  for(const item of data.settings){if(!item||typeof item.key!=='string'||!item.key||item.key===restoredRosterKey||item.key.length>250||!Object.prototype.hasOwnProperty.call(item,'value')||keys.has(item.key))throw Error('Invalid or duplicate setting in backup.');keys.add(item.key)}
   return data;
+ }
+ function restoreFullBackup(data){
+  checkFullBackup(data);
+  return transaction(['notes','settings'],'readwrite',tx=>{
+   const notes=tx.objectStore('notes'),settings=tx.objectStore('settings');
+   const write=()=>{
+    notes.clear();settings.clear();
+    for(const note of data.notes)notes.put(note);
+    for(const item of data.settings)settings.put(item);
+    // Store the same validated roster in the transaction as its dependent records.
+    settings.put({key:restoredRosterKey,value:data.staticFields});
+   };
+   if(fields.length){write();return}
+   // Recheck inside the transaction in case another tab initialized storage.
+   const roster=settings.get(restoredRosterKey), count=notes.count();
+   count.onsuccess=()=>{
+    if(roster.result!==undefined||count.result!==0){tx.abort();return}
+    try{write()}catch{tx.abort()}
+   };
+  });
  }
  restoreFile.onchange=async()=>{
   staged=null;confirmRestore.disabled=true;preview.textContent='';restoreStatus.textContent='';
@@ -810,7 +854,7 @@ else report('Offline — notes are saved on this device; cloud will retry when c
    const data=checkFullBackup(JSON.parse(await f.text()));
    const currentNotes=await getAll('notes'),currentSettings=await getAll('settings');
    const active=data.notes.filter(n=>!n.deletedAt).length;
-   preview.textContent='Backup date: '+(data.createdAt||'not provided')+'\nFields: '+data.staticFields.length+' (match this app)\nScouting notes: '+active+' active, '+(data.notes.length-active)+' deleted markers\nSettings/data records: '+data.settings.length+'\n\nThis device currently has '+currentNotes.length+' note records and '+currentSettings.length+' settings/data records.\n\nRestoring replaces LOCAL notes and settings on this device. It does not change the cloud or other devices. Perform the restore OFFLINE, then review cloud synchronization before reconnecting.';
+   preview.textContent='Backup date: '+(data.createdAt||'not provided')+'\nFields: '+data.staticFields.length+(fields.length?' (match this app)':' (will initialize this device)')+'\nScouting notes: '+active+' active, '+(data.notes.length-active)+' deleted markers\nSettings/data records: '+data.settings.length+'\n\nThis device currently has '+currentNotes.length+' note records and '+currentSettings.length+' settings/data records.\n\nRestoring replaces LOCAL notes and settings on this device. It does not change the cloud or other devices. Perform the restore OFFLINE, then review cloud synchronization before reconnecting.';
    staged=data;confirmRestore.disabled=false;
   }catch(err){preview.textContent='Backup preview failed: '+err.message}
  };
@@ -821,12 +865,7 @@ else report('Offline — notes are saved on this device; cloud will retry when c
   const typed=prompt('Type RESTORE to confirm local replacement.');if(typed!=='RESTORE'){restoreStatus.textContent='Restore cancelled. No changes made.';return}
   confirmRestore.disabled=true;
   try{
-   checkFullBackup(staged);
-   await transaction(['notes','settings'],'readwrite',tx=>{
-    const ns=tx.objectStore('notes'),ss=tx.objectStore('settings');ns.clear();ss.clear();
-    for(const note of staged.notes)ns.put(note);
-    for(const item of staged.settings)ss.put(item);
-   });
+   await restoreFullBackup(staged);
    // Old localStorage migration must not repopulate a restored empty note database.
    try{localStorage.removeItem(key)}catch{}
    restoreStatus.textContent='Local restore completed. Reloading this device…';
