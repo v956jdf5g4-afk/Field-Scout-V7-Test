@@ -86,6 +86,9 @@ const $=id=>document.getElementById(id), key='fieldscout_prototype_notes_v1';let
 let db=null,ready=false,saving=false;
 // Kept device-local. A future private-roster build can start without bundled rows.
 const restoredRosterKey='v7-restored-roster-v1';
+const rosterOwnerKey='v7-roster-owner-v1';
+const cloudRosterKey='v7-private-roster-v1';
+const bundledRoster=fields.length>0;
 function validateBackupRoster(rows){
  if(!Array.isArray(rows)||!rows.length||rows.length>10000)throw Error('Invalid field roster in backup.');
  const ids=new Set();
@@ -583,6 +586,47 @@ async function fs72RenderConflicts(){
  }
 }
 
+// Roster provisioning is read-only. An installed roster stays available offline.
+async function ensurePrivateRoster(userId){
+ if(bundledRoster)return true;
+ if(!userId)throw Error('Sign in to load the private field roster.');
+ const owner=await setting(rosterOwnerKey);
+ if(owner){
+  if(owner!==userId)throw Error('This device roster belongs to another account.');
+  if(!fields.length)throw Error('The local roster is missing. Restore a full-device backup.');
+  return true;
+ }
+ const {data:row,error}=await client.from('field_scout_sync').select('data')
+  .eq('category','setting').eq('record_key',cloudRosterKey).eq('user_id',userId).maybeSingle();
+ if(error)throw error;
+ if(!row)throw Error('A private field roster has not been set up for this account.');
+ const roster=row.data;
+ validateBackupRoster(roster);
+ if(fields.length&&JSON.stringify(fields)!==JSON.stringify(roster)){
+  throw Error('The account roster differs from the local roster. Local records were kept.');
+ }
+ const {data:{session},error:sessionError}=await client.auth.getSession();
+ if(sessionError)throw sessionError;
+ if(session?.user?.id!==userId)throw Error('The signed-in account changed while loading the roster.');
+ await transaction(['settings'],'readwrite',tx=>{
+  const settings=tx.objectStore('settings'), localRoster=settings.get(restoredRosterKey);
+  const localOwner=settings.get(rosterOwnerKey);
+  localOwner.onsuccess=()=>{
+   if((localOwner.result&&localOwner.result.value!==userId)||
+      (localRoster.result&&JSON.stringify(localRoster.result.value)!==JSON.stringify(roster))){
+    tx.abort();return;
+   }
+   try{
+    settings.put({key:restoredRosterKey,value:roster});
+    settings.put({key:rosterOwnerKey,value:userId});
+   }catch{tx.abort()}
+  };
+ });
+ if(fields.length)return true;
+ location.reload();
+ return false;
+}
+
 async function runSync(){
  if(busy){pending=true;return}
  if(resolving||!ready||!client)return;
@@ -594,6 +638,7 @@ async function runSync(){
   const accountLabel=document.getElementById('fsAuthIdentity');
   if(accountLabel)accountLabel.textContent='Cloud account: '+(session.user?.email||'authenticated user (email unavailable)');
   if(!navigator.onLine){await report('Offline — notes saved locally; cloud not checked.');return}
+  if(!await ensurePrivateRoster(session.user?.id))return;
   await report('Checking cloud…');
   const {data:cloud,error:readError}=await client.from('field_scout_sync').select('record_key,data,revision').eq('category','scouting_note');
   if(readError)throw readError;
@@ -801,7 +846,7 @@ else report('Offline — notes are saved on this device; cloud will retry when c
  }catch(e){$('v71ExportStatus').textContent='Export failed: '+e.message}};
  $('v71FullBackup').onclick=async()=>{try{
   if(!ready)throw Error('Local storage is not ready');
-  const notes=await getAll('notes'),settings=(await getAll('settings')).filter(item=>item.key!==restoredRosterKey);
+  const notes=await getAll('notes'),settings=(await getAll('settings')).filter(item=>item.key!==restoredRosterKey&&item.key!==rosterOwnerKey);
   const payload={format:'FieldScoutV71FullDeviceBackup',version:1,createdAt:new Date().toISOString(),notes,settings,staticFields:fields,warning:'Full device export. Restore requires review; do not import through the older scouting-only restore button.'};
   download(JSON.stringify(payload,null,2),'FieldScout-full-device-'+stamp()+'.json','application/json');
   $('v71ExportStatus').textContent='Full-device backup prepared: '+notes.length+' notes and '+settings.length+' settings (including local spray and plan data). Verify it appears in Downloads.';
@@ -822,7 +867,7 @@ else report('Offline — notes are saved on this device; cloud will retry when c
   if(fields.length&&!same(data.staticFields,fields))throw Error('Field list differs from this app version. No changes made; review the backup before restoring.');
   const ids=new Set(),keys=new Set();
   for(const note of data.notes){if(!validRecord(note,rosterIds)||ids.has(note.id))throw Error('Invalid or duplicate scouting note in backup.');ids.add(note.id)}
-  for(const item of data.settings){if(!item||typeof item.key!=='string'||!item.key||item.key===restoredRosterKey||item.key.length>250||!Object.prototype.hasOwnProperty.call(item,'value')||keys.has(item.key))throw Error('Invalid or duplicate setting in backup.');keys.add(item.key)}
+  for(const item of data.settings){if(!item||typeof item.key!=='string'||!item.key||[restoredRosterKey,rosterOwnerKey].includes(item.key)||item.key.length>250||!Object.prototype.hasOwnProperty.call(item,'value')||keys.has(item.key))throw Error('Invalid or duplicate setting in backup.');keys.add(item.key)}
   return data;
  }
  function restoreFullBackup(data){
